@@ -1,10 +1,10 @@
 # 매체 비평 수행평가 사이트 (공통국어2)
 
-학생이 기사 30편 중 1편을 반별 선착순으로 고르고, 시작 버튼을 누른 뒤 60분 동안 분석표를 작성하는 Cloudflare Worker.
+학생이 기사 25편 중 1편을 반별 선착순으로 고르고, 시작 버튼을 누른 뒤 60분 동안 분석표를 작성하는 Cloudflare Worker.
 
 - 학생 화면: `/` (public/index.html)
 - 교사 화면: `/teacher.html` — 교사 비밀번호는 Worker 환경변수 `TEACHER_PW`
-- 서버: `src/worker.js`, 요건 목록: `src/fields.js`, 기사 30편: `src/articles.json`
+- 서버: `src/worker.js`, 요건 목록: `src/fields.js`, 기사 25편: `src/articles.json`
 
 ## 처음 한 번 할 일
 1. Cloudflare → Storage & Databases → D1 → 데이터베이스 생성(이름 `26_2`) → ID를 `wrangler.toml`의 `database_id`에 넣기
