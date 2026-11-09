@@ -130,7 +130,7 @@ function renderSelect() {
     if (el.classList.contains("taken")) { $("#smsg").textContent = "이미 다른 사람이 선택하였습니다."; return; }
     $("#smsg").textContent = "";
     const d = await api("preview?no=" + el.dataset.no);
-    $("#pbody").innerHTML = articleHtml(d.article, false);
+    $("#pbody").innerHTML = articleHtml(d.article, true);   // 선택 전에도 비평 자료까지 보여 준다
     $("#pick").dataset.no = el.dataset.no;
     $("#preview").classList.remove("hide");
     $("#preview").scrollIntoView({ behavior: "smooth" });
