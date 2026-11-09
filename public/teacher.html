@@ -6,14 +6,25 @@
 <title>교사용 - 매체 비평 수행평가</title>
 <style>
   body { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; margin: 0; background: #f3f5f9; color: #111; }
-  main { max-width: 1100px; margin: 0 auto; padding: 16px; }
-  .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-  input, button, select { font: inherit; padding: 6px 10px; }
-  button { background: #1f3864; color: #fff; border: 0; border-radius: 4px; cursor: pointer; }
-  button.s { background: #666; padding: 3px 8px; font-size: 13px; }
-  table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  td, th { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  main { max-width: 1100px; margin: 0 auto; padding: 12px; }
+  .card { background: #fff; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+  input, button, select { font: inherit; padding: 8px 10px; border-radius: 4px; border: 1px solid #bbb; box-sizing: border-box; }
+  button { background: #1f3864; color: #fff; border: 0; cursor: pointer; white-space: nowrap; }
+  button.s { background: #666; padding: 4px 8px; font-size: 13px; }
+  /* 조작 줄: 비밀번호 한 줄, 그 아래 반 선택 + 버튼들이 줄바꿈되며 정렬 */
+  #ctl b { display: block; margin-bottom: 8px; }
+  #ctl .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+  #ctl input { width: 100%; }
+  #ctl select { flex: 1 1 160px; min-width: 0; }
+  #msg { display: block; margin-top: 6px; }
+  /* 표: 좁은 화면에서는 옆으로 밀어 본다 */
+  .wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 760px; }
+  td, th { border: 1px solid #ccc; padding: 5px 7px; text-align: left; vertical-align: middle; white-space: nowrap; }
   th { background: #e7eef7; }
+  td.t { white-space: normal; min-width: 220px; }
+  td.act { white-space: normal; min-width: 180px; } td.act button { margin: 2px 2px 2px 0; }
+  td.t select { max-width: 260px; }
   .warn { color: #c00000; font-weight: bold; }
   .hide { display: none; }
   .ans h3 { color: #1f3864; margin: 14px 0 4px; }
@@ -25,10 +36,14 @@
   <div class="card" id="ctl">
     <b>교사용 화면</b>
     <input id="pw" type="password" placeholder="교사 비밀번호">
-    <select id="cls"></select>
-    <button onclick="overview()">현황 보기</button>
-    <button onclick="extend()">반 전체 시간 연장</button>
-    <button onclick="csv()">CSV 내려받기</button>
+    <div class="row">
+      <select id="cls"></select>
+      <button onclick="overview()">현황 보기</button>
+    </div>
+    <div class="row">
+      <button onclick="extend()">반 전체 시간 연장</button>
+      <button onclick="csv()">CSV 내려받기</button>
+    </div>
     <span id="msg" class="warn"></span>
   </div>
   <div class="card" id="over"></div>
@@ -60,12 +75,12 @@ function overview() { run(async () => {
   const taken = new Set(d.students.map(s => s.article).filter(Boolean));
   const free = d.articles.filter(a => !taken.has(a.no));
   $("#over").innerHTML = `<p>선택된 기사 ${taken.size}/${d.articles.length} · 남은 기사: ${free.map(a => a.no).join(", ") || "없음"}</p>
-  <table><tr><th>학번</th><th>이름</th><th>기사</th><th>시작</th><th>마감</th><th>마지막 저장</th><th>덩어리 입력 거부</th><th></th></tr>` +
+  <div class="wrap"><table><tr><th>학번</th><th>이름</th><th>기사</th><th>시작</th><th>마감</th><th>마지막 저장</th><th>덩어리 입력 거부</th><th></th></tr>` +
   d.students.map(s => `<tr><td>${s.id}</td><td>${s.name}</td>
-    <td>${s.article ? s.article + ". " + A[s.article] : `<select id="as${s.id}">${free.map(a => `<option value="${a.no}">${a.no}. ${a.title}</option>`).join("")}</select> <button class="s" onclick="assign('${s.id}')">배정</button>`}</td>
+    <td class="t">${s.article ? s.article + ". " + A[s.article] : `<select id="as${s.id}">${free.map(a => `<option value="${a.no}">${a.no}. ${a.title}</option>`).join("")}</select> <button class="s" onclick="assign('${s.id}')">배정</button>`}</td>
     <td>${fmt(s.started_at)}</td><td>${s.deadline && s.deadline < d.now ? "<span class=warn>" + fmt(s.deadline) + "</span>" : fmt(s.deadline)}</td><td>${fmt(s.updated_at)}</td>
     <td class="${s.paste_count ? "warn" : ""}">${s.paste_count}</td>
-    <td><button class="s" onclick="view('${s.id}')">답안</button> <button class="s" onclick="extend('${s.id}')">연장</button> <button class="s" onclick="resetpw('${s.id}','${s.name}')">비번 초기화</button>${s.article ? ` <button class="s" onclick="unassign('${s.id}')">선택 해제</button>` : ""}</td></tr>`).join("") + "</table>";
+    <td class="act"><button class="s" onclick="view('${s.id}')">답안</button> <button class="s" onclick="extend('${s.id}')">연장</button> <button class="s" onclick="resetpw('${s.id}','${s.name}')">비번 초기화</button>${s.article ? ` <button class="s" onclick="unassign('${s.id}')">선택 해제</button>` : ""}</td></tr>`).join("") + "</table></div>";
 }); }
 function view(id) { run(async () => {
   const d = await api("student?id=" + id);
