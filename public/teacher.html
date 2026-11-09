@@ -11,6 +11,7 @@
   input, button, select { font: inherit; padding: 8px 10px; border-radius: 4px; border: 1px solid #bbb; box-sizing: border-box; }
   button { background: #1f3864; color: #fff; border: 0; cursor: pointer; white-space: nowrap; }
   button.s { background: #666; padding: 4px 8px; font-size: 13px; }
+  button.warnbtn { background: #8b1a1a; }
   /* 조작 줄: 비밀번호 한 줄, 그 아래 반 선택 + 버튼들이 줄바꿈되며 정렬 */
   #ctl b { display: block; margin-bottom: 8px; }
   #ctl .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
@@ -80,7 +81,7 @@ function overview() { run(async () => {
     <td class="t">${s.article ? s.article + ". " + A[s.article] : `<select id="as${s.id}">${free.map(a => `<option value="${a.no}">${a.no}. ${a.title}</option>`).join("")}</select> <button class="s" onclick="assign('${s.id}')">배정</button>`}</td>
     <td>${fmt(s.started_at)}</td><td>${s.deadline && s.deadline < d.now ? "<span class=warn>" + fmt(s.deadline) + "</span>" : fmt(s.deadline)}</td><td>${fmt(s.updated_at)}</td>
     <td class="${s.paste_count ? "warn" : ""}">${s.paste_count}</td>
-    <td class="act"><button class="s" onclick="view('${s.id}')">답안</button> <button class="s" onclick="extend('${s.id}')">연장</button> <button class="s" onclick="resetpw('${s.id}','${s.name}')">비번 초기화</button>${s.article ? ` <button class="s" onclick="unassign('${s.id}')">선택 해제</button>` : ""}</td></tr>`).join("") + "</table></div>";
+    <td class="act"><button class="s" onclick="view('${s.id}')">답안</button> <button class="s" onclick="extend('${s.id}')">연장</button> <button class="s" onclick="resetpw('${s.id}','${s.name}')">비번 초기화</button> <button class="s warnbtn" onclick="del('${s.id}','${s.name}','answers')">답안 삭제</button> <button class="s warnbtn" onclick="del('${s.id}','${s.name}','student')">학생 삭제</button>${s.article ? ` <button class="s" onclick="unassign('${s.id}')">선택 해제</button>` : ""}</td></tr>`).join("") + "</table></div>";
 }); }
 function view(id) { run(async () => {
   const d = await api("student?id=" + id);
@@ -92,6 +93,14 @@ function view(id) { run(async () => {
 }); }
 function extend(id) { const m = prompt(id ? "이 학생에게 몇 분 연장할까요?" : "이 반 전체(시작한 학생만)에 몇 분 연장할까요?", "5"); if (m) run(async () => { await api("extend", { id, class: $("#cls").value, minutes: Number(m) }); overview(); }); }
 function resetpw(id, name) { if (confirm(`${id} ${name}의 비밀번호를 초기화할까요?\n학생이 다음에 들어올 때 입력하는 비밀번호가 새 비밀번호가 됩니다.`)) run(async () => { await api("reset-pw", { id }); alert("초기화했습니다."); }); }
+// 삭제: 교사 비밀번호를 다시 입력받아 함께 보낸다
+function del(id, name, mode) {
+  const what = mode === "student" ? "가입 기록과 답안을 모두" : "작성한 답안과 시작 기록을";
+  if (!confirm(`${id} ${name}의 ${what} 지웁니다. 되돌릴 수 없습니다.\n계속할까요?`)) return;
+  const pw = prompt("확인을 위해 교사 비밀번호를 다시 입력하세요.");
+  if (pw === null) return;
+  run(async () => { await api("delete", { id, mode, confirm_pw: pw }); $("#detail").classList.add("hide"); overview(); });
+}
 function assign(id) { run(async () => { await api("assign", { id, no: Number($("#as" + id).value) }); overview(); }); }
 function unassign(id) { if (confirm("기사 선택을 해제할까요? 학생이 다시 고를 수 있게 됩니다.")) run(async () => { await api("assign", { id, no: null }); overview(); }); }
 function csv() { run(async () => { const r = await api("export.csv?class=" + $("#cls").value); const b = await r.blob(); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `answers_${$("#cls").value}.csv`; a.click(); }); }

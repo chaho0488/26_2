@@ -145,6 +145,13 @@ async function teacher(p, url, body, env) {
     const row = await env.DB.prepare("SELECT data FROM answers WHERE student_id=?").bind(id).first();
     return json({ ...s, title: ARTICLES.find(a => a.no === s.article)?.title, answers: row ? JSON.parse(row.data) : {}, sections: SECTIONS });
   }
+  if (p === "delete") {                                      // 삭제는 비밀번호를 한 번 더 받아 서버에서 다시 확인한다
+    if (body.confirm_pw !== env.TEACHER_PW) return err("확인 비밀번호가 맞지 않습니다.", 401);
+    await env.DB.prepare("DELETE FROM answers WHERE student_id=?").bind(body.id).run();
+    if (body.mode === "student") await env.DB.prepare("DELETE FROM students WHERE id=?").bind(body.id).run();
+    else await env.DB.prepare("UPDATE students SET started_at=NULL, deadline=NULL, paste_count=0 WHERE id=?").bind(body.id).run();   // 답안만: 다시 시작할 수 있게
+    return json({ ok: true });
+  }
   if (p === "reset-pw") { await env.DB.prepare("UPDATE students SET pw_hash=NULL, token=NULL WHERE id=?").bind(body.id).run(); return json({ ok: true }); }
   if (p === "extend") {                                      // 분 단위 연장. 시작 전 학생은 제외
     const min = Number(body.minutes) || 0;

@@ -94,6 +94,14 @@ await call("/api/t/reset-pw", { id: "1503" }, "a", T);
 ok((await call("/api/me")).status === 401, "초기화하면 기존 로그인 끊김");
 ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "newpw" })).status === 200, "초기화 뒤 새 비번으로 로그인");
 ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "abcd" }, "z")).status === 401, "옛 비번은 거부");
+// 삭제: 확인 비밀번호 틀리면 거부, 맞으면 답안만 / 학생 전체
+ok((await call("/api/t/delete", { id: "1503", mode: "answers", confirm_pw: "nope" }, "a", T)).status === 401, "삭제 확인 비번 틀리면 거부");
+await call("/api/t/delete", { id: "1503", mode: "answers", confirm_pw: "t-pw" }, "a", T);
+r = await call("/api/t/student?id=1503", null, "a", T);
+ok(Object.keys(r.body.answers).length === 0 && r.body.started_at === null && r.body.article === 7, "답안 삭제: 글·시작 기록 지움, 기사 선택 유지");
+ok((await call("/api/me")).body.started_at === null, "학생은 다시 시작 버튼을 누를 수 있는 상태");
+await call("/api/t/delete", { id: "1601", mode: "student", confirm_pw: "t-pw" }, "a", T);
+ok((await call("/api/t/student?id=1601", null, "a", T)).status === 404, "학생 삭제: 기록 자체가 없어짐");
 r = await call("/api/t/export.csv?class=15", null, "a", T);
 ok(r.status === 200 && r.body.includes("1503") && r.body.split("\r\n").length === 3, "CSV: 머리글+2명");
 ok((await call("/not-api")).body === "asset", "정적 파일은 ASSETS로");
