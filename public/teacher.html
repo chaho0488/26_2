@@ -43,13 +43,17 @@ const api = async (p, body) => {
 };
 const run = f => f().catch(e => $("#msg").textContent = e.message);
 let A = {};
-$("#pw").onchange = () => run(async () => {
+// 반 목록 불러오기. 비밀번호가 틀리면 오류, 학생이 없으면 안내
+async function loadClasses() {
   const c = await api("classes");
   $("#cls").innerHTML = c.map(x => `<option value="${x.class}">${x.class[0]}학년 ${x.class[1]}반 (${x.n}명)</option>`).join("");
-  overview();
-});
+  if (!c.length) { $("#over").innerHTML = "<p>비밀번호는 맞습니다. 아직 등록된 학생이 없습니다.</p>"; return false; }
+  return true;
+}
+$("#pw").onchange = () => run(async () => { if (await loadClasses()) overview(); });
 function overview() { run(async () => {
   $("#msg").textContent = "";
+  if (!$("#cls").value && !(await loadClasses())) return;   // 휴대폰처럼 change 신호가 안 온 경우 여기서 불러온다
   const d = await api("overview?class=" + $("#cls").value);
   A = Object.fromEntries(d.articles.map(a => [a.no, a.title]));
   const fmt = t => t ? new Date(t).toLocaleTimeString("ko-KR", { hour12: false }) : "-";
