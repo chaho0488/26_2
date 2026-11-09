@@ -93,6 +93,11 @@ export default {
       return json(await state(await env.DB.prepare("SELECT * FROM students WHERE id=?").bind(s.id).first(), env));
     }
 
+    if (p === "preview") {                                   // 선택 전 읽기용: 로그인만 되어 있으면 어느 기사든 전문을 준다
+      const a = ARTICLES.find(x => x.no === Number(url.searchParams.get("no")));
+      return a ? json({ article: a }) : err("없는 기사 번호입니다.");
+    }
+
     if (p === "article") {
       if (!s.article || !s.started_at) return err("아직 시작 전입니다.", 403);
       const a = ARTICLES.find(x => x.no === s.article);

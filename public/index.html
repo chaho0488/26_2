@@ -24,6 +24,11 @@
   .item small { color: #666; display: block; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+  #pbody { user-select: none; -webkit-user-select: none; line-height: 1.8; }
+  #pbody h2 { font-size: 20px; margin: 0 0 6px; }
+  #pbody table { border-collapse: collapse; margin: 8px auto; }
+  #pbody td, #pbody th { border: 1px solid #999; padding: 4px 10px; font-size: 14px; }
+  #pbody th { background: #e7eef7; }
   #article { user-select: none; -webkit-user-select: none; line-height: 1.8; max-height: calc(100vh - 120px); overflow: auto; position: sticky; top: 70px; }
   #article h2 { font-size: 20px; margin: 0 0 6px; }
   #article table { border-collapse: collapse; margin: 8px auto; }
@@ -58,9 +63,14 @@
   <!-- 2. 기사 선택 -->
   <section id="select" class="card hide">
     <h2>기사 선택</h2>
-    <p><span id="cnt"></span>개 중 1개를 고릅니다. <b>같은 반에서 먼저 고른 기사는 선택할 수 없고, 한 번 고르면 바꿀 수 없습니다.</b> 누가 어떤 기사를 골랐는지는 표시되지 않습니다.</p>
+    <p><span id="cnt"></span>개 중 1개를 고릅니다. 제목을 누르면 기사 전문이 아래에 열립니다. 읽어 본 뒤 "이 기사로 선택"을 누르세요. <b>같은 반에서 먼저 고른 기사는 선택할 수 없고, 한 번 고르면 바꿀 수 없습니다.</b> 누가 어떤 기사를 골랐는지는 표시되지 않습니다.</p>
     <div class="msg" id="smsg"></div>
     <div class="list" id="list"></div>
+    <div id="preview" class="hide">
+      <hr>
+      <div id="pbody" class="noselect"></div>
+      <p><button id="pick">이 기사로 선택</button> <button id="pclose" style="background:#666">목록으로</button></p>
+    </div>
   </section>
 
   <!-- 3. 선택 완료 / 시작 대기 -->
@@ -118,15 +128,35 @@ function renderSelect() {
   $("#list").onclick = async e => {
     const el = e.target.closest(".item"); if (!el) return;
     if (el.classList.contains("taken")) { $("#smsg").textContent = "이미 다른 사람이 선택하였습니다."; return; }
-    if (!confirm(`"${el.textContent.replace(/^\d+\. \S+/, "").trim()}"\n\n이 기사로 확정할까요? 확정 후에는 바꿀 수 없습니다.`)) return;
-    try { S = await api("select", { no: Number(el.dataset.no) }); load(); }
-    catch (err) { $("#smsg").textContent = err.message; S = await api("me"); renderSelect(); }
+    $("#smsg").textContent = "";
+    const d = await api("preview?no=" + el.dataset.no);
+    $("#pbody").innerHTML = articleHtml(d.article, false);
+    $("#pick").dataset.no = el.dataset.no;
+    $("#preview").classList.remove("hide");
+    $("#preview").scrollIntoView({ behavior: "smooth" });
   };
 }
+$("#pclose").onclick = () => { $("#preview").classList.add("hide"); window.scrollTo(0, 0); };
+$("#pick").onclick = async () => {
+  const no = Number($("#pick").dataset.no);
+  if (!confirm(`[기사 ${no}]로 확정할까요? 확정 후에는 바꿀 수 없습니다.`)) return;
+  try { S = await api("select", { no }); $("#preview").classList.add("hide"); load(); }
+  catch (err) { $("#smsg").textContent = err.message; $("#preview").classList.add("hide"); window.scrollTo(0, 0); S = await api("me"); renderSelect(); }
+};
 $("#startbtn").onclick = async () => {
   if (!confirm("지금부터 60분이 시작됩니다. 시작할까요?")) return;
   S = await api("start"); offset = S.now - Date.now(); openWrite();
 };
+
+// 기사 본문 HTML. withCritique가 참이면 비평 자료까지 붙인다(작성 화면용)
+function articleHtml(a, withCritique) {
+  const t = a.table;
+  return `<small>[기사 ${a.no}] ${a.field}</small><h2>${a.title}</h2><small>원문: ${a.media} | ${a.date} | ${a.reporter}<br>주소: ${a.url}</small><hr>`
+    + a.paras.map(p => `<p>${p}</p>`).join("")
+    + `<p style="text-align:center"><b>${t.caption}</b></p><table>${t.rows.map((r, i) => `<tr>${r.map(c => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table>`
+    + (t.source ? `<p style="text-align:center;font-size:13px;color:#555">${t.source}</p>` : "")
+    + (withCritique ? `<hr><small>[전문 비평 자료] ⑤㉣에서 인용 · 수업용 비평 자료(교사 제공)</small><h2>${a.critique.title}</h2>` + a.critique.paras.map(p => `<p>${p}</p>`).join("") : "");
+}
 
 // ── 작성 화면 ──
 let answers = {}, dirty = {}, timerId, lastSent = {};
@@ -134,12 +164,7 @@ async function openWrite() {
   show("write");
   const d = await api("article");
   answers = d.answers; offset = d.now - Date.now();
-  const a = d.article, t = a.table;
-  $("#article").innerHTML = `<small>[기사 ${a.no}] ${a.field}</small><h2>${a.title}</h2><small>원문: ${a.media} | ${a.date} | ${a.reporter}<br>주소: ${a.url}</small><hr>`
-    + a.paras.map(p => `<p>${p}</p>`).join("")
-    + `<p style="text-align:center"><b>${t.caption}</b></p><table>${t.rows.map((r, i) => `<tr>${r.map(c => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table>`
-    + (t.source ? `<p style="text-align:center;font-size:13px;color:#555">${t.source}</p>` : "")
-    + `<hr><small>[전문 비평 자료] ⑤㉣에서 인용 · 수업용 비평 자료(교사 제공)</small><h2>${a.critique.title}</h2>` + a.critique.paras.map(p => `<p>${p}</p>`).join("");
+  $("#article").innerHTML = articleHtml(d.article, true);
   $("#form").innerHTML = S.sections.map(s => `<div class="sec">${s.no} ${s.name}</div>${s.note ? `<div class="hint">${s.note}</div>` : ""}` + s.fields.map(([k, label, hint]) =>
     `<label for="${k}">${label}</label><div class="hint">${hint}</div><textarea id="${k}" name="${k}"></textarea>`).join("")).join("");
   for (const k in answers) { const el = document.getElementById(k); if (el) el.value = answers[k]; }
