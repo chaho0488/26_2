@@ -29,6 +29,7 @@
   #pbody table { border-collapse: collapse; margin: 8px auto; }
   #pbody td, #pbody th { border: 1px solid #999; padding: 4px 10px; font-size: 14px; }
   #pbody th { background: #e7eef7; }
+  .chart svg { width: 100%; height: auto; max-width: 640px; display: block; margin: 8px auto; }
   #article { user-select: none; -webkit-user-select: none; line-height: 1.8; max-height: calc(100vh - 120px); overflow: auto; position: sticky; top: 70px; }
   #article h2 { font-size: 20px; margin: 0 0 6px; }
   #article table { border-collapse: collapse; margin: 8px auto; }
@@ -150,11 +151,13 @@ $("#startbtn").onclick = async () => {
 
 // 기사 본문 HTML. withCritique가 참이면 비평 자료까지 붙인다(작성 화면용)
 function articleHtml(a, withCritique) {
-  const t = a.table;
+  const t = a.table, c = a.chart;
+  const visual = c
+    ? `<p style="text-align:center"><b>${c.caption}</b></p><div class="chart">${c.svg}</div>`   // 막대그래프(SVG)
+    : `<p style="text-align:center"><b>${t.caption}</b></p><table>${t.rows.map((r, i) => `<tr>${r.map(x => i ? `<td>${x}</td>` : `<th>${x}</th>`).join("")}</tr>`).join("")}</table>`
+      + (t.source ? `<p style="text-align:center;font-size:13px;color:#555">${t.source}</p>` : "");
   return `<small>[기사 ${a.no}] ${a.field}</small><h2>${a.title}</h2><small>원문: ${a.media} | ${a.date} | ${a.reporter}<br>주소: ${a.url}</small><hr>`
-    + a.paras.map(p => `<p>${p}</p>`).join("")
-    + `<p style="text-align:center"><b>${t.caption}</b></p><table>${t.rows.map((r, i) => `<tr>${r.map(c => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table>`
-    + (t.source ? `<p style="text-align:center;font-size:13px;color:#555">${t.source}</p>` : "")
+    + a.paras.map(p => `<p>${p}</p>`).join("") + visual
     + (withCritique ? `<hr><small>[전문 비평 자료] ⑤㉣에서 인용 · 수업용 비평 자료(교사 제공)</small><h2>${a.critique.title}</h2>` + a.critique.paras.map(p => `<p>${p}</p>`).join("") : "");
 }
 

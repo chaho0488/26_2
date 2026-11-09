@@ -64,28 +64,7 @@
    "클라이밋 그룹의 올리 윌슨 RE100 총괄은 인터뷰에서 \"신속한 정책 대응이 무엇보다 중요하다\"고 강조했다. 그는 재생에너지 설비의 입지와 인허가 규제를 재생에너지 친화적으로 바꿔야 하며, 화석연료 보조금은 \"단계적으로 폐지되어야 한다\"고 주장했다. 윌슨 총괄에 따르면 한국의 RE100 회원은 약 180곳으로, 한국 전체 전력 소비의 약 10%를 차지한다.",
    "전 세계 RE100 회원사가 2023년 사용한 전력은 545TWh로, 전 세계 발전량의 약 2%에 해당한다. 새 정부의 재생에너지 공약은 긍정적인 출발점으로 평가되지만, 규제 개편과 PPA 활성화가 시급하다는 지적이 나온다."
   ],
-  "table": {
-   "caption": "[표] RE100 회원사의 재생에너지 사용 비중(%)",
-   "source": "자료: RE100 연례보고서 2024",
-   "rows": [
-    [
-     "중국",
-     "베트남",
-     "전 세계 평균",
-     "인도",
-     "일본",
-     "한국"
-    ],
-    [
-     "59",
-     "58",
-     "53",
-     "39",
-     "36",
-     "12"
-    ]
-   ]
-  },
+  "table": null,
   "critique": {
    "title": "재생에너지 보도, 숫자는 많은데 기준이 없다",
    "paras": [
@@ -94,6 +73,11 @@
     "취재원의 구성도 한쪽으로 기울기 쉽다. 사업을 추진하는 지자체와 업계, 또는 반대하는 주민과 환경단체 가운데 한쪽의 말만 싣고 다른 쪽은 '반발이 예상된다'는 식으로 뭉뚱그리는 경우가 많다. 재생에너지는 찬성과 반대가 모두 현실적인 이유를 가진 주제이므로, 양쪽의 말을 직접 인용하지 않은 기사는 공정성을 의심해 볼 필요가 있다.",
     "독자가 할 일은 분명하다. 숫자를 보면 '무엇과 비교한 것인가', 전망을 보면 '누가 계산한 것인가', 갈등을 보면 '다른 쪽의 말은 어디 있는가'를 묻는 것이다. 이 세 질문에 답이 없는 기사는 결론을 보류하고 읽어야 한다."
    ]
+  },
+  "chart": {
+   "caption": "[그래프] RE100 회원사의 재생에너지 사용 비중(%)",
+   "source": "자료: RE100 연례보고서 2024",
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"360\" viewBox=\"0 0 640 360\" font-family=\"Malgun Gothic, Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif\" font-size=\"13\">\n<rect width=\"640\" height=\"360\" fill=\"#fff\"/>\n<text x=\"320.0\" y=\"24\" text-anchor=\"middle\" font-size=\"15\" font-weight=\"bold\">RE100 회원사의 재생에너지 사용 비중(%)</text>\n<line x1=\"70\" y1=\"300.0\" x2=\"620\" y2=\"300.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"304.0\" text-anchor=\"end\" fill=\"#555\">0</text>\n<line x1=\"70\" y1=\"236.0\" x2=\"620\" y2=\"236.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"240.0\" text-anchor=\"end\" fill=\"#555\">20</text>\n<line x1=\"70\" y1=\"172.0\" x2=\"620\" y2=\"172.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"176.0\" text-anchor=\"end\" fill=\"#555\">40</text>\n<line x1=\"70\" y1=\"108.0\" x2=\"620\" y2=\"108.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"112.0\" text-anchor=\"end\" fill=\"#555\">60</text>\n<line x1=\"70\" y1=\"44.0\" x2=\"620\" y2=\"44.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"48.0\" text-anchor=\"end\" fill=\"#555\">80</text>\n<line x1=\"70\" y1=\"44\" x2=\"70\" y2=\"300\" stroke=\"#333\"/><line x1=\"70\" y1=\"300\" x2=\"620\" y2=\"300\" stroke=\"#333\"/>\n<text x=\"64\" y=\"34\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">(%)</text>\n<text x=\"115.8\" y=\"320\" text-anchor=\"middle\">중국</text>\n<rect x=\"83.8\" y=\"111.2\" width=\"61.2\" height=\"188.8\" fill=\"#1F4E79\"/>\n<text x=\"114.3\" y=\"106.2\" text-anchor=\"middle\" font-size=\"12\">59</text>\n<text x=\"207.5\" y=\"320\" text-anchor=\"middle\">베트남</text>\n<rect x=\"175.4\" y=\"114.4\" width=\"61.2\" height=\"185.6\" fill=\"#1F4E79\"/>\n<text x=\"206.0\" y=\"109.4\" text-anchor=\"middle\" font-size=\"12\">58</text>\n<text x=\"299.2\" y=\"320\" text-anchor=\"middle\">전 세계 평균</text>\n<rect x=\"267.1\" y=\"130.4\" width=\"61.2\" height=\"169.6\" fill=\"#1F4E79\"/>\n<text x=\"297.7\" y=\"125.4\" text-anchor=\"middle\" font-size=\"12\">53</text>\n<text x=\"390.8\" y=\"320\" text-anchor=\"middle\">인도</text>\n<rect x=\"358.8\" y=\"175.2\" width=\"61.2\" height=\"124.8\" fill=\"#1F4E79\"/>\n<text x=\"389.3\" y=\"170.2\" text-anchor=\"middle\" font-size=\"12\">39</text>\n<text x=\"482.5\" y=\"320\" text-anchor=\"middle\">일본</text>\n<rect x=\"450.4\" y=\"184.8\" width=\"61.2\" height=\"115.2\" fill=\"#1F4E79\"/>\n<text x=\"481.0\" y=\"179.8\" text-anchor=\"middle\" font-size=\"12\">36</text>\n<text x=\"574.2\" y=\"320\" text-anchor=\"middle\">한국</text>\n<rect x=\"542.1\" y=\"261.6\" width=\"61.2\" height=\"38.4\" fill=\"#1F4E79\"/>\n<text x=\"572.7\" y=\"256.6\" text-anchor=\"middle\" font-size=\"12\">12</text>\n<text x=\"620\" y=\"352\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">자료: RE100 연례보고서 2024</text>\n</svg>"
   }
  },
  {
@@ -277,33 +261,7 @@
    "삼성전자는 앞뒤로 압박을 받고 있다. 첨단 공정에서는 TSMC와, 성숙 공정에서는 중국 업체들과 경쟁하며 어려움을 겪고 있다. 중국 SMIC는 업계 3위다. 카운터포인트리서치는 \"TSMC의 AI 매출 점유율이 더욱 증가할 것으로 예상되는 가운데, 중국 파운드리 업체들의 생산능력 확장으로 내년에는 성숙 공정 파운드리 경쟁이 더 심화될 것으로 예상한다\"고 밝혔다.",
    "삼성전자는 2022년 세계 최초로 3나노 공정 양산을 시작했다. 삼성은 연말 인사에서 한진만 DSA총괄을 파운드리사업부장으로 선임하며 반전을 노리고 있으며, 내년에는 2나노 양산과 대형 고객 확보에 힘을 쏟을 것으로 보인다."
   ],
-  "table": {
-   "caption": "[표] 분기별 파운드리 시장 점유율(%)",
-   "source": "자료: 카운터포인트리서치",
-   "rows": [
-    [
-     "업체",
-     "지난해 4분기",
-     "올해 1분기",
-     "올해 2분기",
-     "올해 3분기"
-    ],
-    [
-     "TSMC",
-     "61",
-     "60",
-     "62",
-     "64"
-    ],
-    [
-     "삼성전자",
-     "14",
-     "13",
-     "13",
-     "12"
-    ]
-   ]
-  },
+  "table": null,
   "critique": {
    "title": "반도체 경쟁 보도, 순위표 뒤에 가려진 것",
    "paras": [
@@ -312,6 +270,11 @@
     "인력 부족이나 공장 건설 같은 주제에서는 전망치가 사람마다 다르다. 10만 명이 부족하다는 장관과 50만 명이 필요하다는 협회장의 말이 한 기사에 나란히 실리는데, 기사는 둘 중 어느 쪽이 어떤 근거로 계산했는지 따지지 않는다. 숫자의 차이를 그대로 보여 주는 것은 좋지만, 차이의 이유를 묻지 않는 것은 기자의 역할을 절반만 한 것이다.",
     "독자는 기사에 등장하는 숫자마다 '어느 기관의 것인가', 전망마다 '어떤 가정에서 나온 것인가'를 확인하고, 당사자의 입장이 빠져 있지 않은지 살펴야 한다."
    ]
+  },
+  "chart": {
+   "caption": "[그래프] 분기별 파운드리 시장 점유율(%)",
+   "source": "자료: 카운터포인트리서치",
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"360\" viewBox=\"0 0 640 360\" font-family=\"Malgun Gothic, Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif\" font-size=\"13\">\n<rect width=\"640\" height=\"360\" fill=\"#fff\"/>\n<text x=\"320.0\" y=\"24\" text-anchor=\"middle\" font-size=\"15\" font-weight=\"bold\">분기별 파운드리 시장 점유율(%)</text>\n<line x1=\"70\" y1=\"300.0\" x2=\"620\" y2=\"300.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"304.0\" text-anchor=\"end\" fill=\"#555\">0</text>\n<line x1=\"70\" y1=\"236.0\" x2=\"620\" y2=\"236.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"240.0\" text-anchor=\"end\" fill=\"#555\">20</text>\n<line x1=\"70\" y1=\"172.0\" x2=\"620\" y2=\"172.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"176.0\" text-anchor=\"end\" fill=\"#555\">40</text>\n<line x1=\"70\" y1=\"108.0\" x2=\"620\" y2=\"108.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"112.0\" text-anchor=\"end\" fill=\"#555\">60</text>\n<line x1=\"70\" y1=\"44.0\" x2=\"620\" y2=\"44.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"48.0\" text-anchor=\"end\" fill=\"#555\">80</text>\n<line x1=\"70\" y1=\"44\" x2=\"70\" y2=\"300\" stroke=\"#333\"/><line x1=\"70\" y1=\"300\" x2=\"620\" y2=\"300\" stroke=\"#333\"/>\n<text x=\"64\" y=\"34\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">(%)</text>\n<text x=\"138.8\" y=\"320\" text-anchor=\"middle\">지난해 4분기</text>\n<rect x=\"90.6\" y=\"104.8\" width=\"45.1\" height=\"195.2\" fill=\"#1F4E79\"/>\n<text x=\"113.2\" y=\"99.8\" text-anchor=\"middle\" font-size=\"12\">61</text>\n<rect x=\"138.8\" y=\"255.2\" width=\"45.1\" height=\"44.8\" fill=\"#C55A11\"/>\n<text x=\"161.3\" y=\"250.2\" text-anchor=\"middle\" font-size=\"12\">14</text>\n<text x=\"276.2\" y=\"320\" text-anchor=\"middle\">올해 1분기</text>\n<rect x=\"228.1\" y=\"108.0\" width=\"45.1\" height=\"192.0\" fill=\"#1F4E79\"/>\n<text x=\"250.7\" y=\"103.0\" text-anchor=\"middle\" font-size=\"12\">60</text>\n<rect x=\"276.2\" y=\"258.4\" width=\"45.1\" height=\"41.6\" fill=\"#C55A11\"/>\n<text x=\"298.8\" y=\"253.4\" text-anchor=\"middle\" font-size=\"12\">13</text>\n<text x=\"413.8\" y=\"320\" text-anchor=\"middle\">올해 2분기</text>\n<rect x=\"365.6\" y=\"101.6\" width=\"45.1\" height=\"198.4\" fill=\"#1F4E79\"/>\n<text x=\"388.2\" y=\"96.6\" text-anchor=\"middle\" font-size=\"12\">62</text>\n<rect x=\"413.8\" y=\"258.4\" width=\"45.1\" height=\"41.6\" fill=\"#C55A11\"/>\n<text x=\"436.3\" y=\"253.4\" text-anchor=\"middle\" font-size=\"12\">13</text>\n<text x=\"551.2\" y=\"320\" text-anchor=\"middle\">올해 3분기</text>\n<rect x=\"503.1\" y=\"95.2\" width=\"45.1\" height=\"204.8\" fill=\"#1F4E79\"/>\n<text x=\"525.7\" y=\"90.2\" text-anchor=\"middle\" font-size=\"12\">64</text>\n<rect x=\"551.2\" y=\"261.6\" width=\"45.1\" height=\"38.4\" fill=\"#C55A11\"/>\n<text x=\"573.8\" y=\"256.6\" text-anchor=\"middle\" font-size=\"12\">12</text>\n<rect x=\"80\" y=\"50\" width=\"12\" height=\"12\" fill=\"#1F4E79\"/><text x=\"96\" y=\"61\" font-size=\"12\">TSMC</text>\n<rect x=\"190\" y=\"50\" width=\"12\" height=\"12\" fill=\"#C55A11\"/><text x=\"206\" y=\"61\" font-size=\"12\">삼성전자</text>\n<text x=\"620\" y=\"352\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">자료: 카운터포인트리서치</text>\n</svg>"
   }
  },
  {
@@ -472,24 +435,7 @@
    "양승윤 유진투자증권 연구원은 \"서빙로봇은 노동력 부족 문제의 해결과 매장 운영 효율성 향상 등 다양한 이점을 갖고 있다\"며 핵심 기술은 대부분 성숙한 수준이라고 평가했다.",
    "현재 국내 시장은 중국산 제품이 약 80%를 차지하는 것으로 알려져 있다. 하지만 국내 기업도 해외로 눈을 돌리고 있다. 일본 시장 점유율 1위인 베어로보틱스는 유럽·동남아 진출을 추진하고, 비로보틱스는 베트남·중동 시장을 두드리고 있다."
   ],
-  "table": {
-   "caption": "[표] 국내 서빙로봇 보급 대수",
-   "source": "※ 올해 수치는 유진투자증권 전망",
-   "rows": [
-    [
-     "구분",
-     "2019년",
-     "지난해",
-     "올해(전망)"
-    ],
-    [
-     "대수",
-     "50여 대",
-     "5,000여 대",
-     "1만 1,000대"
-    ]
-   ]
-  },
+  "table": null,
   "critique": {
    "title": "로봇 보도는 누구의 미래를 말하는가",
    "paras": [
@@ -498,6 +444,11 @@
     "'문턱도 못 넘은', '본격화', '시대 개막' 같은 표현도 살펴볼 필요가 있다. 이런 말은 기자의 판단을 사실처럼 들리게 한다. 경쟁사와 비교하는 기사에서는 특히 한쪽을 앞선 쪽, 다른 쪽을 뒤처진 쪽으로 규정하는 어휘가 결론을 대신하는 경우가 많다.",
     "독자는 기사 속 숫자가 '실적'인지 '목표'인지 구분하고, 그 변화의 영향을 받는 사람의 말이 있는지 찾아보아야 한다. 없다면 그 기사는 미래의 절반만 말하고 있는 것이다."
    ]
+  },
+  "chart": {
+   "caption": "[그래프] 국내 서빙로봇 보급 대수",
+   "source": "※ 올해 수치는 유진투자증권 전망",
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"360\" viewBox=\"0 0 640 360\" font-family=\"Malgun Gothic, Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif\" font-size=\"13\">\n<rect width=\"640\" height=\"360\" fill=\"#fff\"/>\n<text x=\"320.0\" y=\"24\" text-anchor=\"middle\" font-size=\"15\" font-weight=\"bold\">국내 서빙로봇 보급 대수</text>\n<line x1=\"70\" y1=\"300.0\" x2=\"620\" y2=\"300.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"304.0\" text-anchor=\"end\" fill=\"#555\">0</text>\n<line x1=\"70\" y1=\"172.0\" x2=\"620\" y2=\"172.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"176.0\" text-anchor=\"end\" fill=\"#555\">10,000</text>\n<line x1=\"70\" y1=\"44.0\" x2=\"620\" y2=\"44.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"48.0\" text-anchor=\"end\" fill=\"#555\">20,000</text>\n<line x1=\"70\" y1=\"44\" x2=\"70\" y2=\"300\" stroke=\"#333\"/><line x1=\"70\" y1=\"300\" x2=\"620\" y2=\"300\" stroke=\"#333\"/>\n<text x=\"64\" y=\"34\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">(대)</text>\n<text x=\"161.7\" y=\"320\" text-anchor=\"middle\">2019년</text>\n<rect x=\"97.5\" y=\"299.4\" width=\"125.3\" height=\"0.6\" fill=\"#1F4E79\"/>\n<text x=\"160.2\" y=\"294.4\" text-anchor=\"middle\" font-size=\"12\">50</text>\n<text x=\"345.0\" y=\"320\" text-anchor=\"middle\">지난해</text>\n<rect x=\"280.8\" y=\"236.0\" width=\"125.3\" height=\"64.0\" fill=\"#1F4E79\"/>\n<text x=\"343.5\" y=\"231.0\" text-anchor=\"middle\" font-size=\"12\">5,000</text>\n<text x=\"528.3\" y=\"320\" text-anchor=\"middle\">올해(전망)</text>\n<rect x=\"464.2\" y=\"159.2\" width=\"125.3\" height=\"140.8\" fill=\"#1F4E79\"/>\n<text x=\"526.8\" y=\"154.2\" text-anchor=\"middle\" font-size=\"12\">11,000</text>\n<text x=\"620\" y=\"352\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">※ 올해 수치는 유진투자증권 전망</text>\n</svg>"
   }
  },
  {
@@ -654,28 +605,7 @@
    "보고서는 아직 AI가 고용 시장에 뚜렷한 영향을 미쳤다는 증거는 없지만, 이는 AI 혁명이 초기 단계이기 때문이라고 분석했다. 이번 조사는 챗GPT가 공개되기 전에 이뤄졌다. 스테파노 스카페타 OECD 고용노동사회국장은 \"노동시장에서 생성형 AI의 (일자리) 대체 잠재력이 상당하다\"며 임금 감소와 실직을 우려했다.",
    "마티아스 콜먼 OECD 사무총장은 \"AI가 궁극적으로 직장 근로자에게 어떤 영향을 미칠지, 혜택이 클지 위험이 클지는 우리가 취하는 정책적 조치에 달려 있다\"며 정부가 근로자의 변화 대응을 도와야 한다고 강조했다. OECD는 최저임금제와 단체교섭, 정부의 선제적 조치를 대안으로 제시했다. 앞서 골드만삭스도 연초 보고서에서 AI로 10년간 세계 연간 국내총생산(GDP)이 7% 늘어나지만 일자리 3억 개가 사라질 수 있다고 경고했다."
   ],
-  "table": {
-   "caption": "[표] AI로 대체될 위험이 높은 일자리 비중(%)",
-   "source": "",
-   "rows": [
-    [
-     "헝가리",
-     "슬로바키아",
-     "체코",
-     "폴란드",
-     "리투아니아",
-     "OECD 전체"
-    ],
-    [
-     "36.4",
-     "35.7",
-     "35.2",
-     "33.5",
-     "31",
-     "26.8"
-    ]
-   ]
-  },
+  "table": null,
   "critique": {
    "title": "AI 일자리 보도, 경고와 전망 사이",
    "paras": [
@@ -684,6 +614,11 @@
     "교육 분야의 AI 보도는 찬반이 뚜렷해서 오히려 한쪽에 치우치기 쉽다. 정부의 설명만 싣거나 반대 측의 우려만 싣는 기사가 번갈아 나온다. '전문가들은 우려한다'처럼 이름 없는 취재원을 내세운 기사는 그 전문가가 누구인지, 몇 명인지 알 수 없다는 점에서 신뢰성이 떨어진다.",
     "독자는 제목의 숫자를 본문에서 다시 찾아 그 의미를 확인하고, 조사가 언제 누구를 대상으로 했는지, 반대 의견이 이름과 함께 실렸는지 살펴야 한다. AI는 전망이 곧 사실처럼 전해지는 분야이기 때문이다."
    ]
+  },
+  "chart": {
+   "caption": "[그래프] AI로 대체될 위험이 높은 일자리 비중(%)",
+   "source": "",
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"360\" viewBox=\"0 0 640 360\" font-family=\"Malgun Gothic, Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif\" font-size=\"13\">\n<rect width=\"640\" height=\"360\" fill=\"#fff\"/>\n<text x=\"320.0\" y=\"24\" text-anchor=\"middle\" font-size=\"15\" font-weight=\"bold\">AI로 대체될 위험이 높은 일자리 비중(%)</text>\n<line x1=\"70\" y1=\"300.0\" x2=\"620\" y2=\"300.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"304.0\" text-anchor=\"end\" fill=\"#555\">25</text>\n<line x1=\"70\" y1=\"172.0\" x2=\"620\" y2=\"172.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"176.0\" text-anchor=\"end\" fill=\"#555\">35</text>\n<line x1=\"70\" y1=\"44.0\" x2=\"620\" y2=\"44.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"48.0\" text-anchor=\"end\" fill=\"#555\">45</text>\n<line x1=\"70\" y1=\"44\" x2=\"70\" y2=\"300\" stroke=\"#333\"/><line x1=\"70\" y1=\"300\" x2=\"620\" y2=\"300\" stroke=\"#333\"/>\n<text x=\"64\" y=\"34\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">(%)</text>\n<text x=\"115.8\" y=\"320\" text-anchor=\"middle\">헝가리</text>\n<rect x=\"83.8\" y=\"154.1\" width=\"61.2\" height=\"145.9\" fill=\"#1F4E79\"/>\n<text x=\"114.3\" y=\"149.1\" text-anchor=\"middle\" font-size=\"12\">36.4</text>\n<text x=\"207.5\" y=\"320\" text-anchor=\"middle\">슬로바키아</text>\n<rect x=\"175.4\" y=\"163.0\" width=\"61.2\" height=\"137.0\" fill=\"#1F4E79\"/>\n<text x=\"206.0\" y=\"158.0\" text-anchor=\"middle\" font-size=\"12\">35.7</text>\n<text x=\"299.2\" y=\"320\" text-anchor=\"middle\">체코</text>\n<rect x=\"267.1\" y=\"169.4\" width=\"61.2\" height=\"130.6\" fill=\"#1F4E79\"/>\n<text x=\"297.7\" y=\"164.4\" text-anchor=\"middle\" font-size=\"12\">35.2</text>\n<text x=\"390.8\" y=\"320\" text-anchor=\"middle\">폴란드</text>\n<rect x=\"358.8\" y=\"191.2\" width=\"61.2\" height=\"108.8\" fill=\"#1F4E79\"/>\n<text x=\"389.3\" y=\"186.2\" text-anchor=\"middle\" font-size=\"12\">33.5</text>\n<text x=\"482.5\" y=\"320\" text-anchor=\"middle\">리투아니아</text>\n<rect x=\"450.4\" y=\"223.2\" width=\"61.2\" height=\"76.8\" fill=\"#1F4E79\"/>\n<text x=\"481.0\" y=\"218.2\" text-anchor=\"middle\" font-size=\"12\">31</text>\n<text x=\"574.2\" y=\"320\" text-anchor=\"middle\">OECD 전체</text>\n<rect x=\"542.1\" y=\"277.0\" width=\"61.2\" height=\"23.0\" fill=\"#1F4E79\"/>\n<text x=\"572.7\" y=\"272.0\" text-anchor=\"middle\" font-size=\"12\">26.8</text>\n</svg>"
   }
  },
  {
@@ -971,22 +906,7 @@
    "문제는 새 전력망을 갖추는 데 5~15년이 걸린다는 점이다. 미국 애리조나주의 전력회사 APS는 초대형 데이터센터 신규 사업을 당분간 보류하기로 했고, 아일랜드 더블린시는 전력 부족을 이유로 새 데이터센터 설립을 허가하지 않았다. 부동산회사 CBRE는 \"전 세계적으로 가용전력이 부족해서 데이터센터 성장을 저해하고 있다\"고 진단했다. 크리스티안 브루흐 지멘스에너지 CEO는 \"전기 없이는 AI 기술 발전이 없다\"고 강조했다.",
    "국내 전선 기업들도 들썩이고 있다. 최근 한 달 새 대한전선 주가는 46.7%, 가온전선은 39.5%, 일진전기는 50.3% 올랐다. 이유진 유진투자증권 연구원은 \"2000년대 중반 이후 20년 만에 전선 업계에 사이클이 돌아왔다\"고 평가했다."
   ],
-  "table": {
-   "caption": "[표] 전 세계 데이터센터 전력 사용량",
-   "source": "자료: 국제에너지기구(IEA) '2024년 전기보고서'",
-   "rows": [
-    [
-     "구분",
-     "2022년",
-     "2026년(최대 전망)"
-    ],
-    [
-     "전력 사용량",
-     "460TWh",
-     "1,050TWh"
-    ]
-   ]
-  },
+  "table": null,
   "critique": {
    "title": "전기요금과 전력망 보도, 빠진 자리는 누구의 것인가",
    "paras": [
@@ -995,6 +915,11 @@
     "AI 데이터센터와 전력 부족을 다룬 기사는 해외 기업인의 발언과 투자은행의 전망에 기대는 경향이 있다. 그 전망이 맞을 때 이익을 보는 쪽이 누구인지, 전력 소비가 늘어날 때 부담을 지는 쪽이 누구인지는 묻지 않는다. 전력은 결국 모두가 나누어 쓰는 자원이라는 점에서, 수혜자의 전망만 실린 기사는 반쪽짜리다.",
     "독자는 기사가 쓰는 핵심 단어가 누구의 용어인지, 빠진 취재원이 누구인지, 전망을 말하는 사람이 그 전망으로 이익을 보는 쪽은 아닌지 물어야 한다."
    ]
+  },
+  "chart": {
+   "caption": "[그래프] 전 세계 데이터센터 전력 사용량(TWh)",
+   "source": "자료: 국제에너지기구(IEA) '2024년 전기보고서'",
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"360\" viewBox=\"0 0 640 360\" font-family=\"Malgun Gothic, Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif\" font-size=\"13\">\n<rect width=\"640\" height=\"360\" fill=\"#fff\"/>\n<text x=\"320.0\" y=\"24\" text-anchor=\"middle\" font-size=\"15\" font-weight=\"bold\">전 세계 데이터센터 전력 사용량(TWh)</text>\n<line x1=\"70\" y1=\"300.0\" x2=\"620\" y2=\"300.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"304.0\" text-anchor=\"end\" fill=\"#555\">0</text>\n<line x1=\"70\" y1=\"172.0\" x2=\"620\" y2=\"172.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"176.0\" text-anchor=\"end\" fill=\"#555\">1,000</text>\n<line x1=\"70\" y1=\"44.0\" x2=\"620\" y2=\"44.0\" stroke=\"#ddd\"/>\n<text x=\"64\" y=\"48.0\" text-anchor=\"end\" fill=\"#555\">2,000</text>\n<line x1=\"70\" y1=\"44\" x2=\"70\" y2=\"300\" stroke=\"#333\"/><line x1=\"70\" y1=\"300\" x2=\"620\" y2=\"300\" stroke=\"#333\"/>\n<text x=\"64\" y=\"34\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">(TWh)</text>\n<text x=\"207.5\" y=\"320\" text-anchor=\"middle\">2022년</text>\n<rect x=\"111.2\" y=\"241.1\" width=\"189.5\" height=\"58.9\" fill=\"#1F4E79\"/>\n<text x=\"206.0\" y=\"236.1\" text-anchor=\"middle\" font-size=\"12\">460</text>\n<text x=\"482.5\" y=\"320\" text-anchor=\"middle\">2026년(최대 전망)</text>\n<rect x=\"386.2\" y=\"165.6\" width=\"189.5\" height=\"134.4\" fill=\"#1F4E79\"/>\n<text x=\"481.0\" y=\"160.6\" text-anchor=\"middle\" font-size=\"12\">1,050</text>\n<text x=\"620\" y=\"352\" text-anchor=\"end\" fill=\"#555\" font-size=\"11\">자료: 국제에너지기구(IEA) '2024년 전기보고서'</text>\n</svg>"
   }
  },
  {
