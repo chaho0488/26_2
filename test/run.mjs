@@ -85,7 +85,7 @@ ok(r.body.changed === 1, "반 전체 연장은 시작한 학생만(1명)");
 r = await call("/api/t/overview?class=15", null, "a", T);
 ok(r.body.students.length === 2 && r.body.students.find(s => s.id === "1503").article === 7, "반 현황에 선택 기사 보임");
 r = await call("/api/t/student?id=1503", null, "a", T);
-ok(r.body.answers["6a"] === "a" && r.body.title.includes("전기차"), "학생 답안 열람");
+ok(r.body.answers["6a"] === "a" && r.body.title.includes("TSMC"), "학생 답안 열람");
 ok((await call("/api/t/assign", { id: "1501", no: 7 }, "a", T)).status === 409, "같은 반 중복 배정 거부");
 ok((await call("/api/t/assign", { id: "1501", no: 9 }, "a", T)).status === 200, "미선택 학생에게 9번 배정");
 ok((await call("/api/t/assign", { id: "1501", no: null }, "a", T)).status === 200, "선택 해제");
