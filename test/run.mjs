@@ -25,17 +25,17 @@ async function call(path, body, who = "a", headers = {}) {
 let n = 0; const ok = (c, m) => { n++; if (!c) { console.error("실패:", m); process.exit(1); } console.log("통과:", m); };
 
 // 로그인/가입
-ok((await call("/api/login", { id: "1031", name: "가", pw: "1234" })).status === 400, "학번 4자리 거부");
-ok((await call("/api/login", { id: "10315", name: "홍길동", pw: "12" })).status === 400, "비번 2자 거부");
-ok((await call("/api/login", { id: "10315", name: "홍길동", pw: "abcd" })).status === 200, "가입");
-ok((await call("/api/login", { id: "10315", name: "김철수", pw: "abcd" })).status === 400, "같은 학번 다른 이름 거부");
-ok((await call("/api/login", { id: "10315", name: "홍길동", pw: "wrong" })).status === 401, "틀린 비번 거부");
-ok((await call("/api/login", { id: "10315", name: "홍길동 ", pw: "abcd" })).status === 200, "재로그인(이름 공백 허용)");
+ok((await call("/api/login", { id: "103", name: "가", pw: "1234" })).status === 400, "학번 3자리 거부");
+ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "12" })).status === 400, "비번 2자 거부");
+ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "abcd" })).status === 200, "가입");
+ok((await call("/api/login", { id: "1503", name: "김철수", pw: "abcd" })).status === 400, "같은 학번 다른 이름 거부");
+ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "wrong" })).status === 401, "틀린 비번 거부");
+ok((await call("/api/login", { id: "1503", name: "홍길동 ", pw: "abcd" })).status === 200, "재로그인(이름 공백 허용)");
 ok((await call("/api/me", null, "nobody")).status === 401, "쿠키 없으면 401");
 
 // 기사 선택: 같은 반 중복 불가, 다른 반은 가능
-await call("/api/login", { id: "10301", name: "이영희", pw: "pass" }, "b");
-await call("/api/login", { id: "10401", name: "박민수", pw: "pass" }, "c");
+await call("/api/login", { id: "1501", name: "이영희", pw: "pass" }, "b");
+await call("/api/login", { id: "1601", name: "박민수", pw: "pass" }, "c");
 ok((await call("/api/select", { no: 7 })).body.article === 7, "A가 7번 선택");
 let r = await call("/api/select", { no: 7 }, "b");
 ok(r.status === 409 && r.body.error === "이미 다른 사람이 선택하였습니다.", "같은 반 B는 7번 선택 불가");
@@ -62,39 +62,39 @@ ok(r.body.answers["6a"].endsWith("13일"), "이어 쓰기(9자 증가) 허용");
 r = await call("/api/save", { answers: { "6a": "" } });
 ok(r.body.answers["6a"] === "", "지우기 허용");
 // 저장 사이 시간이 흐르면 허용량이 늘어난다(10초 → 20+60=80자)
-db.prepare("UPDATE answers SET updated_at=updated_at-10000 WHERE student_id='10315'").run();
+db.prepare("UPDATE answers SET updated_at=updated_at-10000 WHERE student_id='1503'").run();
 r = await call("/api/save", { answers: { "1a": "나".repeat(75) } });
 ok(r.body.rejected.length === 0, "10초 뒤 75자 허용");
-db.prepare("UPDATE answers SET updated_at=updated_at-600000 WHERE student_id='10315'").run();
+db.prepare("UPDATE answers SET updated_at=updated_at-600000 WHERE student_id='1503'").run();
 r = await call("/api/save", { answers: { "1b": "다".repeat(121) } });
 ok(r.body.rejected.includes("1b"), "10분 쉬어도 121자 덩어리는 거부(상한 120)");
-ok(db.prepare("SELECT paste_count FROM students WHERE id='10315'").get().paste_count === 2, "거부 2회 기록");
+ok(db.prepare("SELECT paste_count FROM students WHERE id='1503'").get().paste_count === 2, "거부 2회 기록");
 
 // 마감 후 저장 불가, 교사 연장 후 가능
-db.prepare("UPDATE students SET deadline=? WHERE id='10315'").run(Date.now() - 1000);
+db.prepare("UPDATE students SET deadline=? WHERE id='1503'").run(Date.now() - 1000);
 ok((await call("/api/save", { answers: { "6a": "a" } })).status === 403, "마감 후 저장 불가");
 const T = { "x-teacher-pw": "t-pw" };
-ok((await call("/api/t/overview?class=103", null, "a", { "x-teacher-pw": "bad" })).status === 401, "교사 비번 틀리면 401");
-r = await call("/api/t/extend", { id: "10315", minutes: 5 }, "a", T);
+ok((await call("/api/t/overview?class=15", null, "a", { "x-teacher-pw": "bad" })).status === 401, "교사 비번 틀리면 401");
+r = await call("/api/t/extend", { id: "1503", minutes: 5 }, "a", T);
 ok(r.body.changed === 1, "교사 개별 연장");
 ok((await call("/api/save", { answers: { "6a": "a" } })).status === 200, "연장 후 저장 가능");
-r = await call("/api/t/extend", { class: "103", minutes: 5 }, "a", T);
+r = await call("/api/t/extend", { class: "15", minutes: 5 }, "a", T);
 ok(r.body.changed === 1, "반 전체 연장은 시작한 학생만(1명)");
 
 // 교사: 현황·답안·배정·초기화·CSV
-r = await call("/api/t/overview?class=103", null, "a", T);
-ok(r.body.students.length === 2 && r.body.students.find(s => s.id === "10315").article === 7, "반 현황에 선택 기사 보임");
-r = await call("/api/t/student?id=10315", null, "a", T);
+r = await call("/api/t/overview?class=15", null, "a", T);
+ok(r.body.students.length === 2 && r.body.students.find(s => s.id === "1503").article === 7, "반 현황에 선택 기사 보임");
+r = await call("/api/t/student?id=1503", null, "a", T);
 ok(r.body.answers["6a"] === "a" && r.body.title.includes("전기차"), "학생 답안 열람");
-ok((await call("/api/t/assign", { id: "10301", no: 7 }, "a", T)).status === 409, "같은 반 중복 배정 거부");
-ok((await call("/api/t/assign", { id: "10301", no: 9 }, "a", T)).status === 200, "미선택 학생에게 9번 배정");
-ok((await call("/api/t/assign", { id: "10301", no: null }, "a", T)).status === 200, "선택 해제");
+ok((await call("/api/t/assign", { id: "1501", no: 7 }, "a", T)).status === 409, "같은 반 중복 배정 거부");
+ok((await call("/api/t/assign", { id: "1501", no: 9 }, "a", T)).status === 200, "미선택 학생에게 9번 배정");
+ok((await call("/api/t/assign", { id: "1501", no: null }, "a", T)).status === 200, "선택 해제");
 ok((await call("/api/me", null, "b")).body.article === null, "해제 뒤 B는 미선택 상태");
-await call("/api/t/reset-pw", { id: "10315" }, "a", T);
+await call("/api/t/reset-pw", { id: "1503" }, "a", T);
 ok((await call("/api/me")).status === 401, "초기화하면 기존 로그인 끊김");
-ok((await call("/api/login", { id: "10315", name: "홍길동", pw: "newpw" })).status === 200, "초기화 뒤 새 비번으로 로그인");
-ok((await call("/api/login", { id: "10315", name: "홍길동", pw: "abcd" }, "z")).status === 401, "옛 비번은 거부");
-r = await call("/api/t/export.csv?class=103", null, "a", T);
-ok(r.status === 200 && r.body.includes("10315") && r.body.split("\r\n").length === 3, "CSV: 머리글+2명");
+ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "newpw" })).status === 200, "초기화 뒤 새 비번으로 로그인");
+ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "abcd" }, "z")).status === 401, "옛 비번은 거부");
+r = await call("/api/t/export.csv?class=15", null, "a", T);
+ok(r.status === 200 && r.body.includes("1503") && r.body.split("\r\n").length === 3, "CSV: 머리글+2명");
 ok((await call("/not-api")).body === "asset", "정적 파일은 ASSETS로");
 console.log(`\n${n}개 모두 통과`);

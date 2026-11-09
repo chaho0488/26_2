@@ -1,4 +1,4 @@
--- 학생: 학번이 기본키. 반(class)은 학번 앞 3자리(학년1+반2).
+-- 학생: 학번이 기본키. 반(class)은 학번 앞 2자리(학년1+반1). 학번 예: 1503
 CREATE TABLE IF NOT EXISTS students (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,

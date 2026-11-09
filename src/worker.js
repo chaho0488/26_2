@@ -8,7 +8,7 @@ const PASTE_MAX = 120;         // 아무리 오래 쉬어도 이 이상 한 번�
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
 const err = (m, s = 400) => json({ error: m }, s);
-const cls = id => id.slice(0, 3);   // 학번 10315 = 1학년 03반 15번 → 반 "103"
+const cls = id => id.slice(0, 2);   // 학번 1503 = 1학년 5반 03번 → 반 "15"
 
 // ── 비밀번호: PBKDF2(WebCrypto). "salt:hash" 형태로 저장 ──
 async function hash(pw, salt) {
@@ -49,7 +49,7 @@ export default {
 
     if (p === "login") {
       const { id, name, pw } = body;
-      if (!/^\d{5}$/.test(id || "")) return err("학번은 숫자 5자리(예: 10315)입니다.");
+      if (!/^\d{4}$/.test(id || "")) return err("학번은 숫자 4자리(예: 1503)입니다.");
       if (!(name || "").trim()) return err("이름을 입력하세요.");
       if ((pw || "").length < 4) return err("비밀번호는 4자 이상입니다.");
       let s = await env.DB.prepare("SELECT * FROM students WHERE id=?").bind(id).first();

@@ -45,7 +45,7 @@ const run = f => f().catch(e => $("#msg").textContent = e.message);
 let A = {};
 $("#pw").onchange = () => run(async () => {
   const c = await api("classes");
-  $("#cls").innerHTML = c.map(x => `<option value="${x.class}">${x.class[0]}학년 ${Number(x.class.slice(1))}반 (${x.n}명)</option>`).join("");
+  $("#cls").innerHTML = c.map(x => `<option value="${x.class}">${x.class[0]}학년 ${x.class[1]}반 (${x.n}명)</option>`).join("");
   overview();
 });
 function overview() { run(async () => {
