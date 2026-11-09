@@ -1,0 +1,13 @@
+name = "26_2"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "26_2"
+database_id = "여기에_D1_데이터베이스_ID"
+
+# 교사 비밀번호는 대시보드 > Settings > Variables and Secrets 에 TEACHER_PW 로 넣는다 (코드에 적지 않음)

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>매체 비평 수행평가</title>
+<style>
+  :root { --b: #1f3864; --g: #f3f5f9; --r: #c00000; }
+  body { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; margin: 0; background: var(--g); color: #111; }
+  header { background: var(--b); color: #fff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2; }
+  #timer { font-size: 22px; font-weight: bold; font-variant-numeric: tabular-nums; }
+  #timer.warn { color: #ffd54f; }
+  main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  input, textarea, button { font: inherit; }
+  input { padding: 8px; border: 1px solid #bbb; border-radius: 4px; width: 100%; box-sizing: border-box; margin: 4px 0 12px; }
+  button { background: var(--b); color: #fff; border: 0; border-radius: 4px; padding: 10px 18px; cursor: pointer; }
+  button:disabled { background: #999; cursor: not-allowed; }
+  .msg { color: var(--r); min-height: 1.4em; margin: 6px 0; }
+  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 8px; }
+  .item { border: 1px solid #ccc; border-radius: 6px; padding: 10px; background: #fff; cursor: pointer; }
+  .item:hover { border-color: var(--b); }
+  .item.taken { background: #eee; color: #888; cursor: not-allowed; }
+  .item small { color: #666; display: block; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+  #article { user-select: none; -webkit-user-select: none; line-height: 1.8; max-height: calc(100vh - 120px); overflow: auto; position: sticky; top: 70px; }
+  #article h2 { font-size: 20px; margin: 0 0 6px; }
+  #article table { border-collapse: collapse; margin: 8px auto; }
+  #article td, #article th { border: 1px solid #999; padding: 4px 10px; font-size: 14px; }
+  #article th { background: #e7eef7; }
+  .sec { font-weight: bold; color: var(--b); font-size: 17px; margin: 18px 0 6px; }
+  label { display: block; font-weight: bold; margin-top: 10px; }
+  .hint { font-size: 13px; color: #555; margin: 2px 0 4px; }
+  textarea { width: 100%; box-sizing: border-box; min-height: 80px; padding: 8px; border: 1px solid #bbb; border-radius: 4px; resize: vertical; }
+  textarea:disabled { background: #f4f4f4; }
+  #save { font-size: 13px; color: #555; }
+  .hide { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div>매체 비평 자료 만들기 수행평가 <span id="who"></span></div>
+  <div><span id="save"></span> <span id="timer"></span></div>
+</header>
+<main>
+  <!-- 1. 로그인/가입 -->
+  <section id="login" class="card">
+    <h2>시작하기</h2>
+    <p>처음이면 비밀번호를 직접 만들어 입력하세요. 다음부터는 같은 학번·이름·비밀번호로 들어옵니다. <b>비밀번호를 잊으면 선생님께 말씀하세요.</b></p>
+    <label>학번 (5자리, 예: 10315)</label><input id="id" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label>이름</label><input id="name" autocomplete="off">
+    <label>비밀번호 (4자 이상)</label><input id="pw" type="password">
+    <div class="msg" id="lmsg"></div>
+    <button id="lbtn">들어가기</button>
+  </section>
+
+  <!-- 2. 기사 선택 -->
+  <section id="select" class="card hide">
+    <h2>기사 선택</h2>
+    <p>30개 중 1개를 고릅니다. <b>같은 반에서 먼저 고른 기사는 선택할 수 없고, 한 번 고르면 바꿀 수 없습니다.</b> 누가 어떤 기사를 골랐는지는 표시되지 않습니다.</p>
+    <div class="msg" id="smsg"></div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <!-- 3. 선택 완료 / 시작 대기 -->
+  <section id="ready" class="card hide">
+    <h2>선택 완료</h2>
+    <p>선택한 기사: <b id="rtitle"></b></p>
+    <p>평가 시간에 선생님의 안내에 따라 아래 버튼을 누르세요. <b>누르는 순간부터 60분</b>이 시작되며, 중간에 나갔다 들어와도 시간은 계속 갑니다.</p>
+    <p>작성 중 <b>붙여넣기·복사·잘라내기는 사용할 수 없습니다.</b> 한 번에 긴 글이 들어오면 저장되지 않고 기록이 남습니다. 입력은 자동으로 저장됩니다.</p>
+    <button id="startbtn">수행평가 시작</button>
+  </section>
+
+  <!-- 4. 작성 -->
+  <section id="write" class="hide two">
+    <div class="card" id="article"></div>
+    <div class="card">
+      <div class="msg" id="wmsg"></div>
+      <form id="form"></form>
+    </div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const show = id => ["login","select","ready","write"].forEach(x => $("#"+x).classList.toggle("hide", x !== id));
+const api = async (p, body) => {
+  const r = await fetch("/api/" + p, body ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) } : {});
+  const d = await r.json().catch(() => ({ error: "서버 응답 오류" }));
+  if (!r.ok) throw new Error(d.error || "오류");
+  return d;
+};
+let S = null, offset = 0;   // S: 서버 상태, offset: 서버 시각 - 내 시각 (학생 기기 시계가 틀려도 마감이 맞도록)
+
+$("#lbtn").onclick = async () => {
+  $("#lmsg").textContent = "";
+  try { await api("login", { id: $("#id").value.trim(), name: $("#name").value, pw: $("#pw").value }); await load(); }
+  catch (e) { $("#lmsg").textContent = e.message; }
+};
+async function load() {
+  try { S = await api("me"); } catch { return show("login"); }
+  offset = S.now - Date.now();
+  $("#who").textContent = `| ${S.id} ${S.name}`;
+  if (!S.article) return renderSelect();
+  if (!S.started_at) { $("#rtitle").textContent = S.articles.find(a => a.no === S.article).title; return show("ready"); }
+  return openWrite();
+}
+function renderSelect() {
+  show("select");
+  $("#list").innerHTML = S.articles.map(a => `<div class="item ${a.taken ? "taken" : ""}" data-no="${a.no}"><small>${a.no}. ${a.field}</small>${a.title}${a.taken ? "<small>이미 다른 사람이 선택하였습니다.</small>" : ""}</div>`).join("");
+  $("#list").onclick = async e => {
+    const el = e.target.closest(".item"); if (!el) return;
+    if (el.classList.contains("taken")) { $("#smsg").textContent = "이미 다른 사람이 선택하였습니다."; return; }
+    if (!confirm(`"${el.textContent.replace(/^\d+\. \S+/, "").trim()}"\n\n이 기사로 확정할까요? 확정 후에는 바꿀 수 없습니다.`)) return;
+    try { S = await api("select", { no: Number(el.dataset.no) }); load(); }
+    catch (err) { $("#smsg").textContent = err.message; S = await api("me"); renderSelect(); }
+  };
+}
+$("#startbtn").onclick = async () => {
+  if (!confirm("지금부터 60분이 시작됩니다. 시작할까요?")) return;
+  S = await api("start"); offset = S.now - Date.now(); openWrite();
+};
+
+// ── 작성 화면 ──
+let answers = {}, dirty = {}, timerId, lastSent = {};
+async function openWrite() {
+  show("write");
+  const d = await api("article");
+  answers = d.answers; offset = d.now - Date.now();
+  const a = d.article, t = a.table;
+  $("#article").innerHTML = `<small>[기사 ${a.no}] ${a.field}</small><h2>${a.title}</h2><small>원문: ${a.media} | ${a.date} | ${a.reporter}<br>주소: ${a.url}</small><hr>`
+    + a.paras.map(p => `<p>${p}</p>`).join("")
+    + `<p style="text-align:center"><b>${t.caption}</b></p><table>${t.rows.map((r, i) => `<tr>${r.map(c => i ? `<td>${c}</td>` : `<th>${c}</th>`).join("")}</tr>`).join("")}</table>`
+    + (t.source ? `<p style="text-align:center;font-size:13px;color:#555">${t.source}</p>` : "");
+  $("#form").innerHTML = S.sections.map(s => `<div class="sec">${s.no} ${s.name}</div>${s.note ? `<div class="hint">${s.note}</div>` : ""}` + s.fields.map(([k, label, hint]) =>
+    `<label for="${k}">${label}</label><div class="hint">${hint}</div><textarea id="${k}" name="${k}"></textarea>`).join("")).join("");
+  for (const k in answers) { const el = document.getElementById(k); if (el) el.value = answers[k]; }
+  // 붙여넣기·복사·잘라내기·끌어놓기 차단(1차). 서버가 덩어리 입력을 다시 거른다(2차).
+  for (const ev of ["paste", "copy", "cut", "drop", "contextmenu"]) document.addEventListener(ev, e => { e.preventDefault(); $("#wmsg").textContent = "붙여넣기·복사는 사용할 수 없습니다. 직접 입력해 주세요."; });
+  $("#form").oninput = e => { dirty[e.target.name] = true; };
+  clearInterval(timerId);
+  timerId = setInterval(tick, 1000); tick();
+  setInterval(save, 1000);
+  window.onbeforeunload = () => Object.keys(dirty).length ? "저장 중입니다." : null;
+}
+function remaining() { return S.deadline - (Date.now() + offset); }
+function tick() {
+  const ms = remaining(), t = $("#timer");
+  if (ms <= 0) { t.textContent = "종료"; lock(); return; }
+  const m = Math.floor(ms / 60000), s = Math.floor(ms % 60000 / 1000);
+  t.textContent = `${m}:${String(s).padStart(2, "0")}`; t.classList.toggle("warn", ms < 5 * 60000);
+}
+function lock() {
+  clearInterval(timerId);
+  document.querySelectorAll("textarea").forEach(el => el.disabled = true);
+  $("#wmsg").textContent = "작성 시간이 끝났습니다. 제출되었습니다.";
+  window.onbeforeunload = null;
+}
+let saving = false;
+async function save() {
+  const keys = Object.keys(dirty); if (!keys.length || saving) return;
+  saving = true;
+  const payload = {}; keys.forEach(k => payload[k] = document.getElementById(k).value); dirty = {};
+  try {
+    const r = await api("save", { answers: payload });
+    answers = r.answers;
+    if (r.rejected.length) {                               // 서버가 거부한 칸은 이전 값으로 되돌림
+      r.rejected.forEach(k => { document.getElementById(k).value = answers[k] || ""; });
+      $("#wmsg").textContent = "한 번에 긴 글이 들어와 저장되지 않았습니다. 직접 입력해 주세요. (기록됨)";
+    } else $("#wmsg").textContent = "";
+    $("#save").textContent = "저장됨 " + new Date(r.saved_at).toLocaleTimeString("ko-KR", { hour12: false });
+  } catch (e) {
+    keys.forEach(k => dirty[k] = true);                     // 실패하면 다음 1초에 다시 보냄
+    if (/끝났/.test(e.message)) lock(); else $("#save").textContent = "저장 재시도 중…";
+  } finally { saving = false; }
+}
+load();
+</script>
+</body>
+</html>
