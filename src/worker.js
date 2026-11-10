@@ -101,9 +101,9 @@ export default {
       return json(await state(await env.DB.prepare("SELECT * FROM students WHERE id=?").bind(s.id).first(), env));
     }
 
-    if (p === "preview") {                                   // 선택 전 읽기용: 로그인만 되어 있으면 어느 기사든 전문을 준다
-      const a = ARTICLES.find(x => x.no === Number(url.searchParams.get("no")));
-      return a ? json({ article: a }) : err("없는 기사 번호입니다.");
+    if (p === "preview") {                                   // 선택 확정 후 읽기용: 자기가 고른 기사만 준다(선택 전 미리 보기 불가)
+      if (!s.article) return err("기사를 선택한 뒤에 읽을 수 있습니다.", 403);
+      return json({ article: ARTICLES.find(x => x.no === s.article) });
     }
 
     if (p === "article") {

@@ -42,11 +42,13 @@ await call("/api/login", { id: "1101", name: "개시", pw: "pass" }, "o1");
 await call("/api/login", { id: "1401", name: "개시", pw: "pass" }, "o4");
 setClock(Date.UTC(2026, 10, 10, 22, 59));                          // 11/11 07:59 KST
 ok((await call("/api/me", null, "o1")).status === 200, "개시 전에도 가입·로그인 가능");
-ok((await call("/api/preview?no=3", null, "o1")).status === 200, "개시 전에도 기사 열람 가능");
+ok((await call("/api/preview", null, "o1")).status === 403, "선택 전에는 기사 전문 열람 불가");
 let ro = await call("/api/select", { no: 3 }, "o1");
 ok(ro.status === 403 && ro.body.error.includes("11/11 08:00"), "1반 11/11 08:00 전 선택 거부: " + ro.body.error);
 setClock(Date.UTC(2026, 10, 10, 23));                              // 11/11 08:00 KST 정각
 ok((await call("/api/select", { no: 3 }, "o1")).status === 200, "1반 11/11 08:00 정각 선택 가능");
+let rp = await call("/api/preview", null, "o1");
+ok(rp.status === 200 && rp.body.article.no === 3 && rp.body.article.paras.length > 0, "확정 후에는 자기 기사 전문 열람 가능(시작 전)");
 ro = await call("/api/select", { no: 3 }, "o4");
 ok(ro.status === 403 && ro.body.error.includes("11/12 08:00"), "4반은 아직 거부: " + ro.body.error);
 setClock(Date.UTC(2026, 10, 11, 23));                              // 11/12 08:00 KST
