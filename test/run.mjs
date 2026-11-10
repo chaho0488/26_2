@@ -88,8 +88,11 @@ db.prepare("UPDATE answers SET updated_at=updated_at-10000 WHERE student_id='150
 r = await call("/api/save", { answers: { "1a": "나".repeat(75) } });
 ok(r.body.rejected.length === 0, "10초 뒤 75자 허용");
 db.prepare("UPDATE answers SET updated_at=updated_at-600000 WHERE student_id='1503'").run();
-r = await call("/api/save", { answers: { "1b": "다".repeat(121) } });
-ok(r.body.rejected.includes("1b"), "10분 쉬어도 121자 덩어리는 거부(상한 120)");
+r = await call("/api/save", { answers: { "1b": "다".repeat(380) } });
+ok(r.body.rejected.length === 0, "10분 뒤 380자는 허용(1분 타이핑 분량)");
+db.prepare("UPDATE answers SET updated_at=updated_at-600000 WHERE student_id='1503'").run();
+r = await call("/api/save", { answers: { "1c": "라".repeat(401) } });
+ok(r.body.rejected.includes("1c"), "10분 쉬어도 401자 덩어리는 거부(상한 400)");
 ok(db.prepare("SELECT paste_count FROM students WHERE id='1503'").get().paste_count === 2, "거부 2회 기록");
 
 // 마감 후 저장 불가, 교사 연장 후 가능
@@ -103,11 +106,20 @@ ok((await call("/api/save", { answers: { "6a": "a" } })).status === 200, "연장
 r = await call("/api/t/extend", { class: "15", minutes: 5 }, "a", T);
 ok(r.body.changed === 1, "반 전체 연장은 시작한 학생만(1명)");
 
+// 제출: 마지막 내용 저장 + 이후 저장·재제출 불가, 교사 현황에 제출 시각
+r = await call("/api/submit", { answers: { "6a": "최종" } });
+ok(r.status === 200 && r.body.submitted_at > 0 && r.body.answers["6a"] === "최종", "제출(마지막 내용 반영)");
+ok((await call("/api/save", { answers: { "6a": "수정" } })).status === 403, "제출 후 저장 불가");
+ok((await call("/api/submit", { answers: {} })).status === 403, "재제출 불가");
+ok((await call("/api/me")).body.submitted_at > 0, "me에 제출 시각");
+r = await call("/api/t/overview?class=15", null, "a", T);
+ok(r.body.students.find(s => s.id === "1503").submitted_at > 0, "교사 현황에 제출 표시");
+
 // 교사: 현황·답안·배정·초기화·CSV
 r = await call("/api/t/overview?class=15", null, "a", T);
 ok(r.body.students.length === 2 && r.body.students.find(s => s.id === "1503").article === 7, "반 현황에 선택 기사 보임");
 r = await call("/api/t/student?id=1503", null, "a", T);
-ok(r.body.answers["6a"] === "a" && r.body.title.includes("TSMC"), "학생 답안 열람");
+ok(r.body.answers["6a"] === "최종" && r.body.title.includes("TSMC"), "학생 답안 열람");
 ok((await call("/api/t/assign", { id: "1501", no: 7 }, "a", T)).status === 409, "같은 반 중복 배정 거부");
 ok((await call("/api/t/assign", { id: "1501", no: 9 }, "a", T)).status === 200, "미선택 학생에게 9번 배정");
 ok((await call("/api/t/assign", { id: "1501", no: null }, "a", T)).status === 200, "선택 해제");

@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS students (
   article INTEGER,              -- 선택한 기사 번호(1~30)
   started_at INTEGER,           -- 학생이 '시작'을 누른 시각(ms)
   deadline INTEGER,             -- 마감 시각(ms). 교사가 연장하면 커짐
+  submitted_at INTEGER,         -- 학생이 [제출]을 누른 시각(ms). 이후 저장 불가
   paste_count INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL
 );

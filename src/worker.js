@@ -4,7 +4,7 @@ import { SECTIONS, KEYS } from "./fields.js";
 const LIMIT_MIN = 60;          // 작성 시간(분)
 const PASTE_BASE = 20;         // 한 번 저장에서 허용하는 글자 증가량
 const PASTE_PER_SEC = 6;       // 저장 사이 시간(초)당 추가 허용량 — 사람 타이핑 속도 상한
-const PASTE_MAX = 120;         // 아무리 오래 쉬어도 이 이상 한 번에 늘면 거부
+const PASTE_MAX = 400;         // 아무리 오래 쉬어도 이 이상 한 번에 늘면 거부(저장 주기 1분 기준: 분당 380자까지 허용)
 // 반별 기사 선택 개시 시각(한국 시간 08:00 = UTC 전날 23:00). 없는 반은 제한 없음. 가입·열람은 그 전에도 가능
 const OPEN_AT = {
   "11": Date.UTC(2026, 10, 10, 23), "12": Date.UTC(2026, 10, 10, 23), "13": Date.UTC(2026, 10, 10, 23),   // 11/11(수) 08:00
@@ -35,7 +35,7 @@ async function student(req, env) {
 async function state(s, env) {
   const taken = new Set((await env.DB.prepare("SELECT article FROM students WHERE class=? AND article IS NOT NULL").bind(s.class).all()).results.map(r => r.article));
   return {
-    id: s.id, name: s.name, article: s.article, started_at: s.started_at, deadline: s.deadline, now: Date.now(), open_at: openAt(s.class),
+    id: s.id, name: s.name, article: s.article, started_at: s.started_at, deadline: s.deadline, submitted_at: s.submitted_at, now: Date.now(), open_at: openAt(s.class),
     articles: ARTICLES.map(a => ({ no: a.no, field: a.field, title: a.title, taken: taken.has(a.no) })),
     sections: SECTIONS,
   };
@@ -110,11 +110,12 @@ export default {
       if (!s.article || !s.started_at) return err("아직 시작 전입니다.", 403);
       const a = ARTICLES.find(x => x.no === s.article);
       const row = await env.DB.prepare("SELECT data, updated_at FROM answers WHERE student_id=?").bind(s.id).first();
-      return json({ article: a, answers: row ? JSON.parse(row.data) : {}, paste_count: s.paste_count, now: Date.now() });
+      return json({ article: a, answers: row ? JSON.parse(row.data) : {}, paste_count: s.paste_count, submitted_at: s.submitted_at, now: Date.now() });
     }
 
-    if (p === "save") {
+    if (p === "save" || p === "submit") {
       if (!s.started_at) return err("아직 시작 전입니다.", 403);
+      if (s.submitted_at) return err("이미 제출했습니다.", 403);
       const now = Date.now();
       if (now > s.deadline) return err("작성 시간이 끝났습니다.", 403);
       const row = await env.DB.prepare("SELECT data, updated_at FROM answers WHERE student_id=?").bind(s.id).first();
@@ -131,7 +132,8 @@ export default {
       await env.DB.prepare("INSERT INTO answers(student_id,data,updated_at) VALUES(?,?,?) ON CONFLICT(student_id) DO UPDATE SET data=excluded.data, updated_at=excluded.updated_at")
         .bind(s.id, JSON.stringify(next), now).run();
       if (rejected.length) await env.DB.prepare("UPDATE students SET paste_count=paste_count+? WHERE id=?").bind(rejected.length, s.id).run();
-      return json({ answers: next, rejected, saved_at: now });
+      if (p === "submit") await env.DB.prepare("UPDATE students SET submitted_at=? WHERE id=?").bind(now, s.id).run();   // 제출: 이후 저장 불가
+      return json({ answers: next, rejected, saved_at: now, submitted_at: p === "submit" ? now : null });
     }
 
     return err("없는 주소입니다.", 404);
@@ -142,13 +144,13 @@ async function teacher(p, url, body, env) {
   const c = url.searchParams.get("class") || body.class;
   if (p === "overview") {                                    // 반 전체 현황: 여기서만 누가 어떤 기사를 골랐는지 보인다
     const rows = (await env.DB.prepare(
-      "SELECT s.id,s.name,s.article,s.started_at,s.deadline,s.paste_count,a.updated_at, length(a.data) AS len FROM students s LEFT JOIN answers a ON a.student_id=s.id WHERE s.class=? ORDER BY s.id").bind(c).all()).results;
+      "SELECT s.id,s.name,s.article,s.started_at,s.deadline,s.submitted_at,s.paste_count,a.updated_at, length(a.data) AS len FROM students s LEFT JOIN answers a ON a.student_id=s.id WHERE s.class=? ORDER BY s.id").bind(c).all()).results;
     return json({ students: rows, articles: ARTICLES.map(a => ({ no: a.no, title: a.title })), now: Date.now() });
   }
   if (p === "classes") return json((await env.DB.prepare("SELECT class, count(*) n FROM students GROUP BY class ORDER BY class").all()).results);
   if (p === "student") {
     const id = url.searchParams.get("id");
-    const s = await env.DB.prepare("SELECT id,name,article,started_at,deadline,paste_count FROM students WHERE id=?").bind(id).first();
+    const s = await env.DB.prepare("SELECT id,name,article,started_at,deadline,submitted_at,paste_count FROM students WHERE id=?").bind(id).first();
     if (!s) return err("없는 학생입니다.", 404);
     const row = await env.DB.prepare("SELECT data FROM answers WHERE student_id=?").bind(id).first();
     return json({ ...s, title: ARTICLES.find(a => a.no === s.article)?.title, answers: row ? JSON.parse(row.data) : {}, sections: SECTIONS });

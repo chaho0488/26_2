@@ -85,10 +85,10 @@ function overview() { run(async () => {
   const taken = new Set(d.students.map(s => s.article).filter(Boolean));
   const free = d.articles.filter(a => !taken.has(a.no));
   $("#over").innerHTML = `<p>선택된 기사 ${taken.size}/${d.articles.length} · 남은 기사: ${free.map(a => a.no).join(", ") || "없음"}</p>
-  <div class="wrap"><table><tr><th>학번</th><th>이름</th><th>기사</th><th>시작</th><th>마감</th><th>마지막 저장</th><th>덩어리 입력 거부</th><th></th></tr>` +
+  <div class="wrap"><table><tr><th>학번</th><th>이름</th><th>기사</th><th>시작</th><th>마감</th><th>마지막 저장</th><th>제출</th><th>덩어리 입력 거부</th><th></th></tr>` +
   d.students.map(s => `<tr><td>${s.id}</td><td>${s.name}</td>
     <td class="t">${s.article ? s.article + ". " + A[s.article] : `<select id="as${s.id}">${free.map(a => `<option value="${a.no}">${a.no}. ${a.title}</option>`).join("")}</select> <button class="s" onclick="assign('${s.id}')">배정</button>`}</td>
-    <td>${fmt(s.started_at)}</td><td>${s.deadline && s.deadline < d.now ? "<span class=warn>" + fmt(s.deadline) + "</span>" : fmt(s.deadline)}</td><td>${fmt(s.updated_at)}</td>
+    <td>${fmt(s.started_at)}</td><td>${s.deadline && s.deadline < d.now ? "<span class=warn>" + fmt(s.deadline) + "</span>" : fmt(s.deadline)}</td><td>${fmt(s.updated_at)}</td><td>${s.submitted_at ? "<b>제출 " + fmt(s.submitted_at) + "</b>" : (s.deadline && s.deadline < d.now ? "시간 종료" : "-")}</td>
     <td class="${s.paste_count ? "warn" : ""}">${s.paste_count}</td>
     <td class="act"><button class="s" onclick="view('${s.id}')">답안</button> <button class="s" onclick="extend('${s.id}')">연장</button> <button class="s" onclick="resetpw('${s.id}','${s.name}')">비번 초기화</button> <button class="s warnbtn" onclick="del('${s.id}','${s.name}','answers')">답안 삭제</button> <button class="s warnbtn" onclick="del('${s.id}','${s.name}','student')">학생 삭제</button>${s.article ? ` <button class="s" onclick="unassign('${s.id}')">선택 해제</button>` : ""}</td></tr>`).join("") + "</table></div>";
 }); }
