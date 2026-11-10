@@ -36,8 +36,11 @@
 <body><main>
   <div class="card" id="ctl">
     <b>교사용 화면</b>
-    <input id="pw" type="password" placeholder="교사 비밀번호">
-    <label style="font-weight:normal;font-size:14px"><input type="checkbox" onchange="document.getElementById('pw').type = this.checked ? 'text' : 'password'"> 보이기</label>
+    <div class="row">
+      <input id="pw" type="password" placeholder="교사 비밀번호">
+      <button onclick="enter()">확인</button>
+    </div>
+    <label style="font-weight:normal;font-size:14px"><input type="checkbox" onchange="document.getElementById('pw').type = this.checked ? 'text' : 'password'"> 비밀번호 보이기</label>
     <div class="row">
       <select id="cls"></select>
       <button onclick="overview()">현황 보기</button>
@@ -67,7 +70,12 @@ async function loadClasses() {
   if (!c.length) { $("#over").innerHTML = "<p>비밀번호는 맞습니다. 아직 등록된 학생이 없습니다.</p>"; return false; }
   return true;
 }
-$("#pw").onchange = () => run(async () => { if (await loadClasses()) overview(); });
+// [확인] 버튼 또는 Enter: 비밀번호를 서버에서 확인한 뒤 반 목록과 현황을 불러온다
+async function enter() {
+  $("#msg").textContent = "";
+  await run(async () => { if (await loadClasses()) { $("#msg").textContent = ""; overview(); } });
+}
+$("#pw").onkeydown = e => { if (e.key === "Enter") enter(); };
 function overview() { run(async () => {
   $("#msg").textContent = "";
   if (!$("#cls").value && !(await loadClasses())) return;   // 휴대폰처럼 change 신호가 안 온 경우 여기서 불러온다
