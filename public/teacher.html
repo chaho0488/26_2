@@ -37,6 +37,7 @@
   <div class="card" id="ctl">
     <b>교사용 화면</b>
     <input id="pw" type="password" placeholder="교사 비밀번호">
+    <label style="font-weight:normal;font-size:14px"><input type="checkbox" onchange="document.getElementById('pw').type = this.checked ? 'text' : 'password'"> 보이기</label>
     <div class="row">
       <select id="cls"></select>
       <button onclick="overview()">현황 보기</button>

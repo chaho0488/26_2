@@ -57,6 +57,7 @@
     <label>학번 (4자리, 예: 1503)</label><input id="id" inputmode="numeric" maxlength="4" autocomplete="off">
     <label>이름</label><input id="name" autocomplete="off">
     <label>비밀번호 (4자 이상)</label><input id="pw" type="password">
+    <label style="font-weight:normal;font-size:14px"><input type="checkbox" onchange="document.getElementById('pw').type = this.checked ? 'text' : 'password'"> 비밀번호 보이기</label>
     <div class="msg" id="lmsg"></div>
     <button id="lbtn">들어가기</button>
   </section>
