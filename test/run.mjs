@@ -22,6 +22,10 @@ async function call(path, body, who = "a", headers = {}) {
   const ct = r.headers.get("content-type") || "";
   return { status: r.status, body: ct.includes("json") ? await r.json() : await r.text() };
 }
+// 시계 이동: 반별 선택 개시 시각(11/11·11/12 08:00 KST) 검사를 날짜와 무관하게 하기 위해 Date.now에 오차를 더한다
+const realNow = Date.now; let shift = 0; Date.now = () => realNow() + shift;
+const setClock = utc => { shift = utc - realNow(); };
+setClock(Date.UTC(2026, 10, 13));   // 기본: 11/13 — 모든 반 선택 가능
 let n = 0; const ok = (c, m) => { n++; if (!c) { console.error("실패:", m); process.exit(1); } console.log("통과:", m); };
 
 // 로그인/가입
@@ -32,6 +36,22 @@ ok((await call("/api/login", { id: "1503", name: "김철수", pw: "abcd" })).sta
 ok((await call("/api/login", { id: "1503", name: "홍길동", pw: "wrong" })).status === 401, "틀린 비번 거부");
 ok((await call("/api/login", { id: "1503", name: "홍길동 ", pw: "abcd" })).status === 200, "재로그인(이름 공백 허용)");
 ok((await call("/api/me", null, "nobody")).status === 401, "쿠키 없으면 401");
+
+// 선택 개시 시각: 1~3반은 11/11 08:00, 4~6반은 11/12 08:00 (KST) 전에는 거부, 가입·열람은 가능
+await call("/api/login", { id: "1101", name: "개시", pw: "pass" }, "o1");
+await call("/api/login", { id: "1401", name: "개시", pw: "pass" }, "o4");
+setClock(Date.UTC(2026, 10, 10, 22, 59));                          // 11/11 07:59 KST
+ok((await call("/api/me", null, "o1")).status === 200, "개시 전에도 가입·로그인 가능");
+ok((await call("/api/preview?no=3", null, "o1")).status === 200, "개시 전에도 기사 열람 가능");
+let ro = await call("/api/select", { no: 3 }, "o1");
+ok(ro.status === 403 && ro.body.error.includes("11/11 08:00"), "1반 11/11 08:00 전 선택 거부: " + ro.body.error);
+setClock(Date.UTC(2026, 10, 10, 23));                              // 11/11 08:00 KST 정각
+ok((await call("/api/select", { no: 3 }, "o1")).status === 200, "1반 11/11 08:00 정각 선택 가능");
+ro = await call("/api/select", { no: 3 }, "o4");
+ok(ro.status === 403 && ro.body.error.includes("11/12 08:00"), "4반은 아직 거부: " + ro.body.error);
+setClock(Date.UTC(2026, 10, 11, 23));                              // 11/12 08:00 KST
+ok((await call("/api/select", { no: 3 }, "o4")).status === 200, "4반 11/12 08:00 선택 가능");
+setClock(Date.UTC(2026, 10, 13));
 
 // 기사 선택: 같은 반 중복 불가, 다른 반은 가능
 await call("/api/login", { id: "1501", name: "이영희", pw: "pass" }, "b");

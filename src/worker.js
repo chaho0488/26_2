@@ -5,6 +5,13 @@ const LIMIT_MIN = 60;          // 작성 시간(분)
 const PASTE_BASE = 20;         // 한 번 저장에서 허용하는 글자 증가량
 const PASTE_PER_SEC = 6;       // 저장 사이 시간(초)당 추가 허용량 — 사람 타이핑 속도 상한
 const PASTE_MAX = 120;         // 아무리 오래 쉬어도 이 이상 한 번에 늘면 거부
+// 반별 기사 선택 개시 시각(한국 시간 08:00 = UTC 전날 23:00). 없는 반은 제한 없음. 가입·열람은 그 전에도 가능
+const OPEN_AT = {
+  "11": Date.UTC(2026, 10, 10, 23), "12": Date.UTC(2026, 10, 10, 23), "13": Date.UTC(2026, 10, 10, 23),   // 11/11(수) 08:00
+  "14": Date.UTC(2026, 10, 11, 23), "15": Date.UTC(2026, 10, 11, 23), "16": Date.UTC(2026, 10, 11, 23),   // 11/12(목) 08:00
+};
+const openAt = c => OPEN_AT[c] || 0;
+const kst = t => new Date(t + 9 * 3600000).toISOString().replace("T", " ").slice(5, 16).replace("-", "/");   // "11/11 08:00"
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
 const err = (m, s = 400) => json({ error: m }, s);
@@ -28,7 +35,7 @@ async function student(req, env) {
 async function state(s, env) {
   const taken = new Set((await env.DB.prepare("SELECT article FROM students WHERE class=? AND article IS NOT NULL").bind(s.class).all()).results.map(r => r.article));
   return {
-    id: s.id, name: s.name, article: s.article, started_at: s.started_at, deadline: s.deadline, now: Date.now(),
+    id: s.id, name: s.name, article: s.article, started_at: s.started_at, deadline: s.deadline, now: Date.now(), open_at: openAt(s.class),
     articles: ARTICLES.map(a => ({ no: a.no, field: a.field, title: a.title, taken: taken.has(a.no) })),
     sections: SECTIONS,
   };
@@ -74,6 +81,7 @@ export default {
 
     if (p === "select") {
       if (s.article) return err("이미 기사를 선택했습니다. 변경은 선생님께 요청하세요.");
+      if (Date.now() < openAt(s.class)) return err(`기사 선택은 ${kst(openAt(s.class))}부터 가능합니다.`, 403);
       const no = Number(body.no);
       if (!ARTICLES.some(a => a.no === no)) return err("없는 기사 번호입니다.");
       try {
