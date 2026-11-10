@@ -11,6 +11,12 @@ const OPEN_AT = {
   "14": Date.UTC(2026, 10, 11, 23), "15": Date.UTC(2026, 10, 11, 23), "16": Date.UTC(2026, 10, 11, 23),   // 11/12(목) 08:00
 };
 const openAt = c => OPEN_AT[c] || 0;
+// 반별 수행평가 [시작] 개시 시각(한국 시간 08:30 = UTC 전날 23:30). 그 전에는 가입·기사 선택·읽기까지만 가능. 없는 반은 제한 없음
+const START_AT = {
+  "11": Date.UTC(2026, 10, 16, 23, 30), "12": Date.UTC(2026, 10, 16, 23, 30), "13": Date.UTC(2026, 10, 16, 23, 30),   // 11/17(화) 08:30
+  "14": Date.UTC(2026, 10, 17, 23, 30), "15": Date.UTC(2026, 10, 17, 23, 30), "16": Date.UTC(2026, 10, 17, 23, 30),   // 11/18(수) 08:30
+};
+const startAt = c => START_AT[c] || 0;
 const kst = t => new Date(t + 9 * 3600000).toISOString().replace("T", " ").slice(5, 16).replace("-", "/");   // "11/11 08:00"
 
 const json = (d, s = 200, h = {}) => new Response(JSON.stringify(d), { status: s, headers: { "content-type": "application/json; charset=utf-8", ...h } });
@@ -35,7 +41,7 @@ async function student(req, env) {
 async function state(s, env) {
   const taken = new Set((await env.DB.prepare("SELECT article FROM students WHERE class=? AND article IS NOT NULL").bind(s.class).all()).results.map(r => r.article));
   return {
-    id: s.id, name: s.name, article: s.article, started_at: s.started_at, deadline: s.deadline, submitted_at: s.submitted_at, now: Date.now(), open_at: openAt(s.class),
+    id: s.id, name: s.name, article: s.article, started_at: s.started_at, deadline: s.deadline, submitted_at: s.submitted_at, now: Date.now(), open_at: openAt(s.class), start_at: startAt(s.class),
     articles: ARTICLES.map(a => ({ no: a.no, field: a.field, title: a.title, taken: taken.has(a.no) })),
     sections: SECTIONS,
   };
@@ -96,6 +102,7 @@ export default {
       if (!s.article) return err("먼저 기사를 선택하세요.");
       if (!s.started_at) {
         const now = Date.now();
+        if (now < startAt(s.class)) return err(`수행평가는 ${kst(startAt(s.class))}부터 시작할 수 있습니다.`, 403);
         await env.DB.prepare("UPDATE students SET started_at=?, deadline=? WHERE id=?").bind(now, now + LIMIT_MIN * 60000, s.id).run();
       }
       return json(await state(await env.DB.prepare("SELECT * FROM students WHERE id=?").bind(s.id).first(), env));

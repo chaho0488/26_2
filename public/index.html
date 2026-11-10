@@ -88,6 +88,7 @@
       <li>기사 위의 원문 주소는 기록용입니다. 근거는 <b>화면에 배부된 기사 안에서만</b> 찾으세요. 원문 기사에만 있는 내용은 인정하지 않습니다.</li>
       <li>⑤㉣ 전문 비평 자료는 기사 아래에 함께 제공되며, 그 글의 문장을 따옴표로 인용합니다.</li>
     </ul>
+    <p id="startmsg" class="hide" style="background:#fff3cd;padding:10px;border-radius:6px"></p>
     <button id="startbtn">수행평가 시작</button>
     <hr>
     <p><b>선택한 기사 읽어 두기</b> (시작 전에도 읽을 수 있습니다)</p>
@@ -127,11 +128,27 @@ async function load() {
   $("#who").textContent = `| ${S.id} ${S.name}`;
   if (!S.article) return renderSelect();
   if (!S.started_at) {
-    $("#rtitle").textContent = S.articles.find(a => a.no === S.article).title; show("ready");
+    $("#rtitle").textContent = S.articles.find(a => a.no === S.article).title; show("ready"); gateStart();
     const d = await api("preview"); $("#rbody").innerHTML = articleHtml(d.article, true);   // 확정 후에는 시작 전에도 읽을 수 있다
     return;
   }
   return openWrite();
+}
+// "11월 17일(화) 08:30" 형태(한국 시간)
+function kdate(t) {
+  const d = new Date(t + 9 * 3600000), day = ["일","월","화","수","목","금","토"][d.getUTCDay()];
+  return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일(${day}) ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
+}
+// 평가 개시 전이면 [수행평가 시작]을 잠그고 언제 열리는지 알린다. 시각이 되면 자동으로 열린다
+function gateStart() {
+  const wait = S.start_at - (Date.now() + offset);
+  const before = wait > 0;
+  $("#startmsg").classList.toggle("hide", !before);
+  $("#startbtn").disabled = before;
+  if (before) {
+    $("#startmsg").textContent = `우리 반 수행평가는 ${kdate(S.start_at)}부터 시작할 수 있습니다. 그 전에는 아래 기사를 읽어 둘 수만 있습니다.`;
+    setTimeout(gateStart, Math.min(wait + 500, 30000));
+  }
 }
 // 선택 개시 전이면 안내문을 띄우고 [이 기사로 선택] 버튼을 잠근다(기사 읽기는 가능). 시각이 되면 자동으로 열린다
 function gateSelect() {
@@ -140,8 +157,7 @@ function gateSelect() {
   $("#openmsg").classList.toggle("hide", !before);
   $("#pick").disabled = before;
   if (before) {
-    const d = new Date(S.open_at + 9 * 3600000), day = ["일","월","화","수","목","금","토"][d.getUTCDay()];
-    $("#openmsg").textContent = `우리 반 기사 선택은 ${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일(${day}) ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}부터 가능합니다. 그 전에는 기사를 읽어 볼 수만 있습니다.`;
+    $("#openmsg").textContent = `우리 반 기사 선택은 ${kdate(S.open_at)}부터 가능합니다. 그 전에는 기사를 읽어 볼 수만 있습니다.`;
     setTimeout(gateSelect, Math.min(wait + 500, 30000));
   }
 }
@@ -168,8 +184,9 @@ $("#pick").onclick = async () => {
   catch (err) { $("#smsg").textContent = err.message; $("#preview").classList.add("hide"); window.scrollTo(0, 0); S = await api("me"); renderSelect(); }
 };
 $("#startbtn").onclick = async () => {
-  if (!confirm("지금부터 60분이 시작됩니다. 시작할까요?")) return;
-  S = await api("start"); offset = S.now - Date.now(); openWrite();
+  if (!confirm("지금부터 60분이 시작됩니다. 중간에 나가도 시간은 계속 갑니다. 시작할까요?")) return;
+  try { S = await api("start"); } catch (e) { $("#startmsg").textContent = e.message; $("#startmsg").classList.remove("hide"); return; }
+  offset = S.now - Date.now(); openWrite();
 };
 
 // 기사 본문 HTML. withCritique가 참이면 비평 자료까지 붙인다(작성 화면용)

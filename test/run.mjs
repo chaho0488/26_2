@@ -25,7 +25,7 @@ async function call(path, body, who = "a", headers = {}) {
 // 시계 이동: 반별 선택 개시 시각(11/11·11/12 08:00 KST) 검사를 날짜와 무관하게 하기 위해 Date.now에 오차를 더한다
 const realNow = Date.now; let shift = 0; Date.now = () => realNow() + shift;
 const setClock = utc => { shift = utc - realNow(); };
-setClock(Date.UTC(2026, 10, 13));   // 기본: 11/13 — 모든 반 선택 가능
+setClock(Date.UTC(2026, 10, 20));   // 기본: 11/20 — 모든 반 선택·시작 가능
 let n = 0; const ok = (c, m) => { n++; if (!c) { console.error("실패:", m); process.exit(1); } console.log("통과:", m); };
 
 // 로그인/가입
@@ -53,7 +53,29 @@ ro = await call("/api/select", { no: 3 }, "o4");
 ok(ro.status === 403 && ro.body.error.includes("11/12 08:00"), "4반은 아직 거부: " + ro.body.error);
 setClock(Date.UTC(2026, 10, 11, 23));                              // 11/12 08:00 KST
 ok((await call("/api/select", { no: 3 }, "o4")).status === 200, "4반 11/12 08:00 선택 가능");
-setClock(Date.UTC(2026, 10, 13));
+
+// 평가 개시 시각: 1~3반 11/17 08:30, 4~6반 11/18 08:30 (KST) 전에는 [시작] 거부
+setClock(Date.UTC(2026, 10, 16, 23, 29));                          // 11/17 08:29 KST
+ro = await call("/api/start", {}, "o1");
+ok(ro.status === 403 && ro.body.error.includes("11/17 08:30"), "1반 11/17 08:30 전 시작 거부: " + ro.body.error);
+ok((await call("/api/me", null, "o1")).body.started_at === null, "거부된 시작은 시간이 흐르지 않음");
+ok((await call("/api/me", null, "o1")).body.start_at === Date.UTC(2026, 10, 16, 23, 30), "화면에 개시 시각 전달");
+ok((await call("/api/preview", null, "o1")).status === 200, "개시 전에도 고른 기사 읽기는 가능");
+setClock(Date.UTC(2026, 10, 16, 23, 30));                          // 11/17 08:30 KST 정각
+ro = await call("/api/start", {}, "o1");
+ok(ro.status === 200 && ro.body.deadline - ro.body.started_at === 3600000, "1반 11/17 08:30 정각 시작 가능, 60분");
+ro = await call("/api/start", {}, "o4");
+ok(ro.status === 403 && ro.body.error.includes("11/18 08:30"), "4반은 11/17에 시작 거부: " + ro.body.error);
+setClock(Date.UTC(2026, 10, 17, 23, 30));                          // 11/18 08:30 KST
+ok((await call("/api/start", {}, "o4")).status === 200, "4반 11/18 08:30 시작 가능");
+// 나갔다 와도 시간은 계속: 40분 뒤 다시 들어오면 마감은 그대로, 61분 뒤에는 저장 거부
+const dl4 = (await call("/api/me", null, "o4")).body.deadline;
+setClock(Date.UTC(2026, 10, 18, 0, 10));
+ro = await call("/api/me", null, "o4");
+ok(ro.body.deadline === dl4 && ro.body.deadline - ro.body.now === 20 * 60000, "40분 뒤 재접속: 남은 시간 20분");
+setClock(Date.UTC(2026, 10, 18, 0, 31));
+ok((await call("/api/save", { answers: { "6a": "x" } }, "o4")).status === 403, "61분 뒤 저장 거부");
+setClock(Date.UTC(2026, 10, 20));
 
 // 기사 선택: 같은 반 중복 불가, 다른 반은 가능
 await call("/api/login", { id: "1501", name: "이영희", pw: "pass" }, "b");
