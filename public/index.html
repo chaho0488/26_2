@@ -112,7 +112,7 @@
       <div class="msg" id="wmsg"></div>
       <form id="form"></form>
       <p><button id="submit" style="width:100%;font-size:18px">제출</button></p>
-      <p class="hint">제출을 누르면 더 이상 고칠 수 없습니다. 제출하지 않아도 시간이 끝나면 그때까지 저장된 내용이 자동 제출됩니다.</p>
+      <p class="hint">제출한 뒤에도 시간이 남아 있으면 고칠 수 있고, 고친 내용은 자동 저장됩니다. 제출하지 않아도 시간이 끝나면 그때까지 저장된 내용이 최종 답안이 됩니다.</p>
     </div>
     <div id="tabs"><button type="button" onclick="tab(false)">기사·비평 자료</button><button type="button" onclick="tab(true)">답안 작성</button></div>
   </section>
@@ -123,6 +123,11 @@ const show = id => ["login","select","ready","write"].forEach(x => $("#"+x).clas
 const api = async (p, body) => {
   const r = await fetch("/api/" + p, body ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) } : {});
   const d = await r.json().catch(() => ({ error: "서버 응답 오류" }));
+  // 로그인이 풀림(다른 기기에서 로그인하면 이전 기기는 끊긴다): 계속 쓰는 것처럼 보이지 않게 로그인 화면으로 보낸다
+  if (r.status === 401 && p !== "login" && S) {
+    clearInterval(timerId); clearInterval(saveId); window.onbeforeunload = null; S = null; show("login");
+    $("#lmsg").textContent = "다른 기기에서 로그인하여 이 기기의 접속이 끊겼습니다. 이 기기에서 계속하려면 다시 로그인하세요.";
+  }
   if (!r.ok) throw new Error(d.error || "오류");
   return d;
 };
@@ -235,20 +240,23 @@ async function openWrite() {
   $("#form").addEventListener("focusout", () => save());    // 칸을 벗어나면 바로 저장
   clearInterval(timerId);
   timerId = setInterval(tick, 1000); tick();
-  clearInterval(saveId); saveId = setInterval(save, 60000);  // 1분마다 자동 저장
+  clearInterval(saveId); saveId = setInterval(() => Object.keys(dirty).length ? save() : api("me").catch(() => {}), 60000);  // 1분마다 자동 저장. 쓸 것이 없으면 접속이 끊겼는지만 확인
   document.addEventListener("visibilitychange", () => { if (document.hidden) save(); });   // 화면을 벗어날 때도 저장 시도
   window.onbeforeunload = () => Object.keys(dirty).length ? "저장 중입니다." : null;
-  if (d.submitted_at) lock("제출이 완료되었습니다.");
+  if (d.submitted_at) submitted();
 }
 $("#submit").onclick = async () => {
-  if (!confirm("제출할까요? 제출 후에는 고칠 수 없습니다.")) return;
+  if (!confirm("제출할까요? 제출한 뒤에도 시간이 남아 있으면 고칠 수 있습니다.")) return;
   const payload = {}; document.querySelectorAll("#form textarea").forEach(el => payload[el.name] = el.value); dirty = {};
   try {
     const r = await api("submit", { answers: payload });
     if (r.rejected.length) { r.rejected.forEach(k => { document.getElementById(k).value = r.answers[k] || ""; }); }
-    lock("제출이 완료되었습니다." + (r.rejected.length ? " (덩어리 입력으로 저장되지 않은 칸은 이전 내용으로 제출됨)" : ""));
-  } catch (e) { $("#wmsg").textContent = e.message; if (/끝났|이미 제출/.test(e.message)) lock(); }
+    submitted();
+    $("#wmsg").textContent = "제출되었습니다. 남은 시간 동안 고칠 수 있습니다." + (r.rejected.length ? " (덩어리 입력으로 저장되지 않은 칸은 이전 내용으로 제출됨)" : "");
+  } catch (e) { $("#wmsg").textContent = e.message; if (/끝났/.test(e.message)) lock(); }
 };
+// 제출 표시: 저장 안내 문구에 지워지지 않도록 버튼에 남긴다
+function submitted() { $("#submit").textContent = "제출됨 (시간 안에는 계속 고칠 수 있음)"; }
 function remaining() { return S.deadline - (Date.now() + offset); }
 function tick() {
   const ms = remaining(), t = $("#timer");
@@ -278,7 +286,7 @@ async function save() {
     $("#save").textContent = "저장됨 " + new Date(r.saved_at).toLocaleTimeString("ko-KR", { hour12: false });
   } catch (e) {
     keys.forEach(k => dirty[k] = true);                     // 실패하면 다음 저장 때 다시 보냄
-    if (/끝났/.test(e.message)) lock(); else if (/이미 제출/.test(e.message)) lock("제출이 완료되었습니다."); else $("#save").textContent = "저장 재시도 중…";
+    if (/끝났/.test(e.message)) lock(); else $("#save").textContent = "저장 재시도 중…";
   } finally { saving = false; }
 }
 load();

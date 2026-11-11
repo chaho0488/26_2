@@ -122,7 +122,6 @@ export default {
 
     if (p === "save" || p === "submit") {
       if (!s.started_at) return err("아직 시작 전입니다.", 403);
-      if (s.submitted_at) return err("이미 제출했습니다.", 403);
       const now = Date.now();
       if (now > s.deadline) return err("작성 시간이 끝났습니다.", 403);
       const row = await env.DB.prepare("SELECT data, updated_at FROM answers WHERE student_id=?").bind(s.id).first();
@@ -139,7 +138,7 @@ export default {
       await env.DB.prepare("INSERT INTO answers(student_id,data,updated_at) VALUES(?,?,?) ON CONFLICT(student_id) DO UPDATE SET data=excluded.data, updated_at=excluded.updated_at")
         .bind(s.id, JSON.stringify(next), now).run();
       if (rejected.length) await env.DB.prepare("UPDATE students SET paste_count=paste_count+? WHERE id=?").bind(rejected.length, s.id).run();
-      if (p === "submit") await env.DB.prepare("UPDATE students SET submitted_at=? WHERE id=?").bind(now, s.id).run();   // 제출: 이후 저장 불가
+      if (p === "submit") await env.DB.prepare("UPDATE students SET submitted_at=? WHERE id=?").bind(now, s.id).run();   // 제출 표시만 남긴다. 마감 전까지는 계속 고칠 수 있다
       return json({ answers: next, rejected, saved_at: now, submitted_at: p === "submit" ? now : null });
     }
 
@@ -166,7 +165,7 @@ async function teacher(p, url, body, env) {
     if (body.confirm_pw !== env.TEACHER_PW) return err("확인 비밀번호가 맞지 않습니다.", 401);
     await env.DB.prepare("DELETE FROM answers WHERE student_id=?").bind(body.id).run();
     if (body.mode === "student") await env.DB.prepare("DELETE FROM students WHERE id=?").bind(body.id).run();
-    else await env.DB.prepare("UPDATE students SET started_at=NULL, deadline=NULL, paste_count=0 WHERE id=?").bind(body.id).run();   // 답안만: 다시 시작할 수 있게
+    else await env.DB.prepare("UPDATE students SET started_at=NULL, deadline=NULL, submitted_at=NULL, paste_count=0 WHERE id=?").bind(body.id).run();   // 답안만: 다시 시작할 수 있게
     return json({ ok: true });
   }
   if (p === "reset-pw") { await env.DB.prepare("UPDATE students SET pw_hash=NULL, token=NULL WHERE id=?").bind(body.id).run(); return json({ ok: true }); }
