@@ -15,7 +15,7 @@
   /* 조작 줄: 비밀번호 한 줄, 그 아래 반 선택 + 버튼들이 줄바꿈되며 정렬 */
   #ctl b { display: block; margin-bottom: 8px; }
   #ctl .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
-  #ctl input { width: 100%; }
+  #pw { flex: 1 1 160px; min-width: 0; }
   #ctl select { flex: 1 1 160px; min-width: 0; }
   #msg { display: block; margin-top: 6px; }
   /* 표: 좁은 화면에서는 옆으로 밀어 본다 */
@@ -36,11 +36,14 @@
 <body><main>
   <div class="card" id="ctl">
     <b>교사용 화면</b>
-    <div class="row">
-      <input id="pw" type="password" placeholder="교사 비밀번호">
-      <button onclick="enter()">확인</button>
+    <div id="login">
+      <div class="row">
+        <input id="pw" type="password" placeholder="교사 비밀번호">
+        <button onclick="enter()">확인</button>
+      </div>
+      <label style="font-weight:normal;font-size:14px"><input type="checkbox" onchange="document.getElementById('pw').type = this.checked ? 'text' : 'password'"> 비밀번호 보이기</label>
     </div>
-    <label style="font-weight:normal;font-size:14px"><input type="checkbox" onchange="document.getElementById('pw').type = this.checked ? 'text' : 'password'"> 비밀번호 보이기</label>
+    <div class="row hide" id="authed">비밀번호 확인됨 <button class="s" onclick="lock()">잠그기</button></div>
     <div class="row">
       <select id="cls"></select>
       <button onclick="overview()">현황 보기</button>
@@ -66,6 +69,8 @@ let A = {};
 // 반 목록 불러오기. 비밀번호가 틀리면 오류, 학생이 없으면 안내
 async function loadClasses() {
   const c = await api("classes");
+  // 비밀번호가 맞았으므로 입력 칸을 접는다. 값은 숨겨진 칸에 남아 이후 요청에 계속 쓰인다
+  $("#login").classList.add("hide"); $("#authed").classList.remove("hide");
   $("#cls").innerHTML = c.map(x => `<option value="${x.class}">${x.class[0]}학년 ${x.class[1]}반 (${x.n}명)</option>`).join("");
   if (!c.length) { $("#over").innerHTML = "<p>비밀번호는 맞습니다. 아직 등록된 학생이 없습니다.</p>"; return false; }
   return true;
@@ -74,6 +79,12 @@ async function loadClasses() {
 async function enter() {
   $("#msg").textContent = "";
   await run(async () => { if (await loadClasses()) { $("#msg").textContent = ""; overview(); } });
+}
+// [잠그기]: 비밀번호를 비우고 학생 정보를 화면에서 지운 뒤 입력 칸을 다시 보인다
+function lock() {
+  $("#pw").value = ""; $("#cls").innerHTML = ""; $("#over").innerHTML = ""; $("#msg").textContent = "";
+  $("#detail").classList.add("hide"); $("#detail").innerHTML = "";
+  $("#authed").classList.add("hide"); $("#login").classList.remove("hide");
 }
 $("#pw").onkeydown = e => { if (e.key === "Enter") enter(); };
 function overview() { run(async () => {
