@@ -23,7 +23,17 @@
   .item.taken { background: #eee; color: #888; cursor: not-allowed; }
   .item small { color: #666; display: block; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+  #tabs { display: none; }
+  /* 좁은 화면(휴대폰): 기사와 답안 칸을 한 번에 하나만 보이고 아래 고정 버튼으로 오간다 */
+  @media (max-width: 900px) {
+    .two { grid-template-columns: 1fr; }
+    #write { padding-bottom: 56px; }
+    #write #article { max-height: none; position: static; }
+    #write:not(.ans) #ans, #write.ans #article { display: none; }
+    #tabs { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; }
+    #tabs button { flex: 1; border-radius: 0; background: #667; padding: 14px 0; }
+    #write:not(.ans) #tabs button:first-child, #write.ans #tabs button:last-child { background: var(--b); font-weight: bold; }
+  }
   #pbody, #rbody { user-select: none; -webkit-user-select: none; line-height: 1.8; }
   #rbody h2 { font-size: 20px; margin: 0 0 6px; }
   #rbody table { border-collapse: collapse; margin: 8px auto; }
@@ -98,12 +108,13 @@
   <!-- 4. 작성 -->
   <section id="write" class="hide two">
     <div class="card" id="article"></div>
-    <div class="card">
+    <div class="card" id="ans">
       <div class="msg" id="wmsg"></div>
       <form id="form"></form>
       <p><button id="submit" style="width:100%;font-size:18px">제출</button></p>
       <p class="hint">제출을 누르면 더 이상 고칠 수 없습니다. 제출하지 않아도 시간이 끝나면 그때까지 저장된 내용이 자동 제출됩니다.</p>
     </div>
+    <div id="tabs"><button type="button" onclick="tab(false)">기사·비평 자료</button><button type="button" onclick="tab(true)">답안 작성</button></div>
   </section>
 </main>
 <script>
@@ -202,6 +213,13 @@ function articleHtml(a, withCritique) {
 }
 
 // ── 작성 화면 ──
+// 휴대폰 전환 버튼: 기사와 답안 칸을 오갈 때 각자 읽던 위치를 기억했다가 되돌린다
+const pos = [0, 0];
+function tab(ans) {
+  const w = $("#write"), was = w.classList.contains("ans");
+  if (was === ans) return;
+  pos[+was] = scrollY; w.classList.toggle("ans", ans); scrollTo(0, pos[+ans]);
+}
 let answers = {}, dirty = {}, timerId, saveId, lastSent = {};
 async function openWrite() {
   show("write");
