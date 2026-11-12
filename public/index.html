@@ -8,10 +8,11 @@
   :root { --b: #1f3864; --g: #f3f5f9; --r: #c00000; }
   body { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; margin: 0; background: var(--g); color: #111; }
   header { background: var(--b); color: #fff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2; }
-  #timer { font-size: 22px; font-weight: bold; font-variant-numeric: tabular-nums; }
-  #timer.warn { color: #ffd54f; }
+  #who { font-weight: bold; }
+  #timer { font-size: 26px; font-weight: bold; font-variant-numeric: tabular-nums; color: #ffd54f; }
+  #timer.warn { background: #c00000; color: #fff; padding: 0 6px; border-radius: 4px; }   /* 5분 미만: 빨간 바탕 */
   #hr { text-align: right; white-space: nowrap; margin-left: 10px; }
-  #hr .tsave { background: #fff; color: var(--b); padding: 6px 10px; font-size: 14px; font-weight: bold; vertical-align: 3px; }
+  #hr .tsave { background: #2e9e5b; color: #fff; padding: 6px 10px; font-size: 14px; font-weight: bold; vertical-align: 4px; margin-right: 6px; }
   #hr .tsave:disabled { background: #999; color: #fff; }
   main { max-width: 1200px; margin: 0 auto; padding: 16px; }
   .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
@@ -59,7 +60,7 @@
 </head>
 <body>
 <header>
-  <div>매체 비평 자료 만들기 수행평가 <span id="who"></span></div>
+  <div id="who"></div>
   <div id="hr"><button class="tsave hide" type="button">임시저장</button> <span id="timer"></span><div id="save"></div></div>
 </header>
 <main>
@@ -145,7 +146,7 @@ $("#lbtn").onclick = async () => {
 async function load() {
   try { S = await api("me"); } catch { return show("login"); }
   offset = S.now - Date.now();
-  $("#who").textContent = `| ${S.id} ${S.name}`;
+  $("#who").textContent = `${S.id} ${S.name}`;
   if (!S.article) return renderSelect();
   if (!S.started_at) {
     $("#rtitle").textContent = S.articles.find(a => a.no === S.article).title; show("ready"); gateStart();
