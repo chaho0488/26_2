@@ -10,6 +10,9 @@
   header { background: var(--b); color: #fff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2; }
   #timer { font-size: 22px; font-weight: bold; font-variant-numeric: tabular-nums; }
   #timer.warn { color: #ffd54f; }
+  #hr { text-align: right; white-space: nowrap; margin-left: 10px; }
+  #hr .tsave { background: #fff; color: var(--b); padding: 6px 10px; font-size: 14px; font-weight: bold; vertical-align: 3px; }
+  #hr .tsave:disabled { background: #999; color: #fff; }
   main { max-width: 1200px; margin: 0 auto; padding: 16px; }
   .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
   input, textarea, button { font: inherit; }
@@ -57,7 +60,7 @@
 <body>
 <header>
   <div>매체 비평 자료 만들기 수행평가 <span id="who"></span></div>
-  <div><span id="save"></span> <span id="timer"></span></div>
+  <div id="hr"><button class="tsave hide" type="button">임시저장</button> <span id="timer"></span><div id="save"></div></div>
 </header>
 <main>
   <!-- 1. 로그인/가입 -->
@@ -111,7 +114,7 @@
     <div class="card" id="ans">
       <div class="msg" id="wmsg"></div>
       <form id="form"></form>
-      <p><button id="tsave" type="button" style="width:100%;background:#667">임시저장</button></p>
+      <p><button class="tsave" type="button" style="width:100%;background:#667">임시저장</button></p>
       <p><button id="submit" style="width:100%;font-size:18px">제출</button></p>
       <p class="hint">제출한 뒤에도 시간이 남아 있으면 고칠 수 있고, 고친 내용은 자동 저장됩니다. 제출하지 않아도 시간이 끝나면 그때까지 저장된 내용이 최종 답안이 됩니다.</p>
     </div>
@@ -120,7 +123,7 @@
 </main>
 <script>
 const $ = s => document.querySelector(s);
-const show = id => ["login","select","ready","write"].forEach(x => $("#"+x).classList.toggle("hide", x !== id));
+const show = id => { ["login","select","ready","write"].forEach(x => $("#"+x).classList.toggle("hide", x !== id)); $("#hr .tsave").classList.toggle("hide", id !== "write"); };   // 위쪽 임시저장 버튼은 작성 화면에서만
 const api = async (p, body) => {
   const r = await fetch("/api/" + p, body ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) } : {});
   const d = await r.json().catch(() => ({ error: "서버 응답 오류" }));
@@ -247,10 +250,11 @@ async function openWrite() {
   if (d.submitted_at) submitted();
 }
 // [임시저장]: 자동 저장과 같은 저장을 지금 바로 한다. 결과는 위쪽 시계 옆 '저장됨 시각'으로 보인다
-$("#tsave").onclick = async () => {
+const tsave = async () => {
   if (!Object.keys(dirty).length) { $("#save").textContent = "모두 저장되어 있음"; return; }
   $("#save").textContent = "저장 중…"; await save();
 };
+document.querySelectorAll(".tsave").forEach(b => b.onclick = tsave);
 $("#submit").onclick = async () => {
   if (!confirm("제출할까요? 제출한 뒤에도 시간이 남아 있으면 고칠 수 있습니다.")) return;
   const payload = {}; document.querySelectorAll("#form textarea").forEach(el => payload[el.name] = el.value); dirty = {};
@@ -273,7 +277,7 @@ function tick() {
 function lock(msg = "작성 시간이 끝났습니다. 제출되었습니다.") {
   clearInterval(timerId); clearInterval(saveId);
   document.querySelectorAll("textarea").forEach(el => el.disabled = true);
-  $("#submit").disabled = true; $("#tsave").disabled = true;
+  $("#submit").disabled = true; document.querySelectorAll(".tsave").forEach(b => b.disabled = true);
   $("#wmsg").textContent = msg;
   window.onbeforeunload = null;
 }
